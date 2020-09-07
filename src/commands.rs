@@ -1,16 +1,39 @@
-use std::error::Error;
-
 #[macro_export]
 macro_rules! vec_of_strings {
     ($($x:expr),*) => (vec![$($x.to_string()),*]);
 }
 
 
-pub fn build_command(arguments: Vec<String>) -> String {
-    let mut arguments = arguments;
+pub fn build_command(mut arguments: Vec<String>) -> String {
     arguments.remove(0);
     let command = arguments.join(" ");
     String::from(command)
+}
+
+pub fn handle_command<'a>(command: String) -> Result<(), &'a str> {
+    let help_command_string = "\
+    Usage:
+    
+    raptr hatch - Starts the webinterface
+    raptr hatch <port> - Starts the webinterface at <port> (port is optional)
+    
+    raptr publish - Genereates HTML file(s) to standard path
+    raptr publish <path> - Generates HTML file(s) to specified path
+    raptr publish web - Generates HTML file(s) to standard webroot
+    
+    raptr config <option>=<value> - Sets <option> to <value> in config file";
+
+    match command.as_str() {
+        "" | "-h" => {
+            print(String::from(help_command_string));
+            Ok(())
+        },
+        _ => return Err("Command not found")
+    }
+}
+
+pub fn print(string: String) {
+    println!("{}", string);
 }
 
 #[cfg(test)]
@@ -19,7 +42,6 @@ mod tests {
 
     #[test]
     pub fn builds_command() {
-        // is .to_string really necessary or is there a better way?
         let help_one = vec_of_strings![""];
         let help_two = vec_of_strings!["raptr", "-h"];
         
@@ -29,7 +51,6 @@ mod tests {
         let publish_one = vec_of_strings!["raptr", "publish"];
         let publish_two = vec_of_strings!["raptr", "publish", "/output"];
         let publish_three = vec_of_strings!["raptr", "publish", "web"];
-        let publish_four = vec_of_strings!["raptr", "publish", "web", "/var/www/html"];
 
         let config = vec_of_strings!["raptr", "config", "something=value"];
 
@@ -42,8 +63,14 @@ mod tests {
         assert_eq!("publish", build_command(publish_one));
         assert_eq!("publish /output", build_command(publish_two));
         assert_eq!("publish web", build_command(publish_three));
-        assert_eq!("publish web /var/www/html", build_command(publish_four));
 
         assert_eq!("config something=value", build_command(config));
+    }
+
+    #[test]
+    pub fn handles_command() {
+        assert_eq!(Ok(()), handle_command(String::from("")));
+        assert_eq!(Ok(()), handle_command(String::from("-h")));
+        assert_eq!(Err("Command not found"), handle_command(String::from("invalid")));
     }
 }
