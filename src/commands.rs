@@ -24,7 +24,7 @@ pub fn handle_command<'a>(command: String) -> Result<(), &'a str> {
     raptr config <option>=<value> - Sets <option> to <value> in config file";
 
     match command.as_str() {
-        "" | "-h" => {
+        "" | "help" => {
             print(String::from(help_command_string));
             Ok(())
         },
@@ -43,7 +43,7 @@ mod tests {
     #[test]
     pub fn builds_command() {
         let help_one = vec_of_strings![""];
-        let help_two = vec_of_strings!["raptr", "-h"];
+        let help_two = vec_of_strings!["raptr", "help"];
         
         let start_one = vec_of_strings!["raptr", "hatch"];
         let start_two = vec_of_strings!["raptr", "hatch", "3000"];
@@ -55,7 +55,7 @@ mod tests {
         let config = vec_of_strings!["raptr", "config", "something=value"];
 
         assert_eq!("", build_command(help_one));
-        assert_eq!("-h", build_command(help_two));
+        assert_eq!("help", build_command(help_two));
 
         assert_eq!("hatch", build_command(start_one));
         assert_eq!("hatch 3000", build_command(start_two));
@@ -70,7 +70,7 @@ mod tests {
     #[test]
     pub fn handles_command() {
         assert_eq!(Ok(()), handle_command(String::from("")));
-        assert_eq!(Ok(()), handle_command(String::from("-h")));
+        assert_eq!(Ok(()), handle_command(String::from("help")));
         assert_eq!(Err("Command not found"), handle_command(String::from("invalid")));
     }
 }
