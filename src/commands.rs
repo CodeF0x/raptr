@@ -11,6 +11,16 @@ pub fn build_command(mut arguments: Vec<String>) -> String {
 }
 
 pub fn handle_command<'a>(command: String) -> Result<(), &'a str> {
+    match command.as_str() {
+        "" | "help" => {
+            print_help();
+            Ok(())
+        },
+        _ => return Err("Command not found")
+    }
+}
+
+fn print_help() {
     let help_command_string = "\
     Usage:
     
@@ -22,18 +32,7 @@ pub fn handle_command<'a>(command: String) -> Result<(), &'a str> {
     raptr publish web - Generates HTML file(s) to standard webroot
     
     raptr config <option>=<value> - Sets <option> to <value> in config file";
-
-    match command.as_str() {
-        "" | "help" => {
-            print(String::from(help_command_string));
-            Ok(())
-        },
-        _ => return Err("Command not found")
-    }
-}
-
-pub fn print(string: String) {
-    println!("{}", string);
+    println!("{}", help_command_string);
 }
 
 #[cfg(test)]
