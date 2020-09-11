@@ -5,23 +5,27 @@ macro_rules! vec_of_strings {
     ($($x:expr),*) => (vec![$($x.to_string()),*]);
 }
 
-
-pub fn build_command(mut arguments: Vec<String>) -> String {
-    arguments.remove(0);
-    let command = arguments.join(" ");
-    String::from(command)
+/// Concatenates command line arguments to a string that represents a command.
+pub fn build_command(arguments: Vec<String>) -> String {
+    String::from(arguments.join(" "))
 }
 
+/// Checks if command exists and launches appropriate action.
 pub fn handle_command<'a>(command: String) -> Result<(), &'a str> {
     match command.as_str() {
         "" | "help" => {
             print_help();
             Ok(())
         },
-        _ => return Err("Command not found")
+        "hatch" => {
+            web::launch_server();
+            Ok(())
+        },
+        _ => Err("Command not found")
     }
 }
 
+/// Prints the help command.
 fn print_help() {
     let help_command_string = "\
     Usage:
