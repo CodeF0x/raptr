@@ -1,12 +1,8 @@
-#![feature(proc_macro_hygiene, decl_macro)]
 
 use std::env;
 
 mod commands;
 mod web;
-
-
-#[macro_use] extern crate rocket;
 
 fn main() {
     let args: Vec<String> = env::args().skip(1).collect();

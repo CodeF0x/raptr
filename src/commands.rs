@@ -18,7 +18,6 @@ pub fn handle_command<'a>(command: String) -> Result<(), &'a str> {
             Ok(())
         },
         "hatch" => {
-            web::launch_server();
             Ok(())
         },
         _ => Err("Command not found")
