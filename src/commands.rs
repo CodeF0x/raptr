@@ -48,16 +48,16 @@ mod tests {
     #[test]
     pub fn builds_command() {
         let help_one = vec_of_strings![""];
-        let help_two = vec_of_strings!["raptr", "help"];
+        let help_two = vec_of_strings!["help"];
         
-        let start_one = vec_of_strings!["raptr", "hatch"];
-        let start_two = vec_of_strings!["raptr", "hatch", "3000"];
+        let start_one = vec_of_strings!["hatch"];
+        let start_two = vec_of_strings!["hatch", "3000"];
 
-        let publish_one = vec_of_strings!["raptr", "publish"];
-        let publish_two = vec_of_strings!["raptr", "publish", "/output"];
-        let publish_three = vec_of_strings!["raptr", "publish", "web"];
+        let publish_one = vec_of_strings!["publish"];
+        let publish_two = vec_of_strings!["publish", "/output"];
+        let publish_three = vec_of_strings!["publish", "web"];
 
-        let config = vec_of_strings!["raptr", "config", "something=value"];
+        let config = vec_of_strings!["config", "something=value"];
 
         assert_eq!("", build_command(help_one));
         assert_eq!("help", build_command(help_two));
