@@ -77,5 +77,7 @@ mod tests {
         assert_eq!(Ok(()), handle_command(String::from("")));
         assert_eq!(Ok(()), handle_command(String::from("help")));
         assert_eq!(Err("Command not found"), handle_command(String::from("invalid")));
+
+        // Testing of webserver / webinterface happens in web.rs!!
     }
 }
