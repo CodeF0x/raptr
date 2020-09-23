@@ -8,7 +8,8 @@ fn index(req: vial::Request) -> vial::Response {
   vial::Response::from_asset("html/index.html")
 }
 
-pub fn launch_server() {
+pub fn launch_server(port: u16) {
+  let address = format!("{}{}", "localhost:", port);
   vial::asset_dir!("./static");
-  vial::run!().unwrap();
+  vial::run_with_banner!("raptr startet at {}", address).unwrap();
 }
