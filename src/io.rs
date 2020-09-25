@@ -1,8 +1,8 @@
 use directories::UserDirs;
-use std::path::{Path, PathBuf};
 use std::fs::File;
 use std::io::prelude::*;
 use std::io::ErrorKind;
+use std::path::{Path, PathBuf};
 
 /// Writes markdown to markdown file in draft directory
 pub fn write_markdown_to_draft(filename: &str, markdown: &str) -> Result<(), ErrorKind> {
@@ -13,16 +13,16 @@ pub fn write_markdown_to_draft(filename: &str, markdown: &str) -> Result<(), Err
         Ok(file) => file,
         Err(err) => {
             eprintln!("Could not create file because: {}", err);
-            return Err(err.kind())
-        },
+            return Err(err.kind());
+        }
     };
 
     match file.write_all(markdown.as_bytes()) {
         Ok(_) => Ok(()),
         Err(err) => {
             eprintln!("Could not save draft because: {}", err);
-            return Err(err.kind())
-        },
+            return Err(err.kind());
+        }
     }
 }
 
@@ -46,7 +46,7 @@ fn get_draft_directory() -> PathBuf {
 }
 
 /// Creates draft directory.
-/// 
+///
 /// # Panics
 /// Panics if draft directory could not get created.
 fn create_draft_directory(path: &str) {

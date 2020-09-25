@@ -14,14 +14,14 @@ pub fn handle_arguments<'a>(args: Vec<String>) {
         match arg.as_str() {
             "" | "help" => {
                 print_help();
-            },
+            }
             "hatch" => {
                 if let Some(arg) = args.next() {
                     port = arg.parse().unwrap();
                 }
                 web::launch_server(port);
-            },
-            _ => eprintln!("Command not found!")
+            }
+            _ => eprintln!("Command not found!"),
         }
     }
 }

@@ -1,9 +1,8 @@
-
 use std::env;
 
 mod commands;
-mod web;
 mod io;
+mod web;
 
 fn main() {
     io::setup();
