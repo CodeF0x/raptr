@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 vial = "0.1.3"
 directories = "3.0.1"
+comrak = "0.8"

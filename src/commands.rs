@@ -21,6 +21,25 @@ pub fn handle_arguments<'a>(args: Vec<String>) {
                 }
                 web::launch_server(port);
             }
+            "publish" => {
+                if let Some(arg) = args.next() {
+                    match arg.as_str() {
+                        "web" => {
+                            if let Some(arg) = args.next() {
+                                let webroot = arg;
+                                // TODO: publish with extra webroot given
+                            } else {
+                                // TODO: publish with no extra webroot given
+                            }
+                        }
+                        _ => {
+                            // TODO: publish to specific output directory
+                        }
+                    }
+                } else {
+
+                }
+            }
             _ => eprintln!("Command not found!"),
         }
     }
