@@ -3,6 +3,7 @@ use std::fs::File;
 use std::io::prelude::*;
 use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
+use std::fs;
 
 /// Writes markdown to markdown file in draft directory
 pub fn write_markdown_to_draft(filename: &str, markdown: &str) -> Result<(), ErrorKind> {
@@ -54,4 +55,27 @@ fn create_draft_directory(path: &str) {
         Ok(_) => println!("Created directory"),
         Err(err) => panic!("Could not create directory: {}", err),
     };
+}
+
+/// Gets all filenames in draft directory.
+pub fn get_files() -> Vec<String> {
+    let dirs = fs::read_dir(get_draft_directory()).unwrap();
+    let mut paths = Vec::new();
+
+    for path in dirs {
+        let path_str = path
+            .unwrap()
+            .path()
+            .display()
+            .to_string();
+
+        let split: Vec<&str> = path_str
+            .split("/")
+            .collect();
+
+        let file_name = String::from(*split.last().unwrap());
+        paths.push(file_name);
+    }
+
+    paths
 }
