@@ -79,3 +79,14 @@ pub fn get_files() -> Vec<String> {
 
     paths
 }
+
+/// Reads single file by file name.
+pub fn read_file(name: &str) -> String {
+    let draft_directory = get_draft_directory();
+    let path = format!("{}/{}", draft_directory.display().to_string(), name);
+
+    match fs::read_to_string(Path::new(&path)) {
+        Ok(content) => content,
+        Err(_err) => String::from("Could not read file! Go back and try again."),
+    }
+}
