@@ -60,22 +60,15 @@ fn create_draft_directory(path: &str) {
 
 /// Gets all filenames in draft directory.
 pub fn get_files() -> Vec<String> {
-    let dirs = fs::read_dir(get_draft_directory()).unwrap();
     let mut paths = Vec::new();
-
-    for path in dirs {
-        let path_str = path
-            .unwrap()
-            .path()
-            .display()
-            .to_string();
-
-        let split: Vec<&str> = path_str
-            .split("/")
-            .collect();
-
-        let file_name = String::from(*split.last().unwrap());
-        paths.push(file_name);
+    
+    if let Ok(dirs) = fs::read_dir(get_draft_directory()) {
+        for path in dirs {
+            if let Ok(path) = path {
+                let file_name = path.file_name().into_string().unwrap();
+                paths.push(file_name);
+            }
+        }
     }
 
     paths
@@ -105,6 +98,7 @@ pub fn publish_drafts(path: Option<&String>) {
                 let mut document_dir = user_dirs.document_dir().unwrap().to_owned();
                 document_dir.push("raptr-output");
                 output_dir = document_dir;
+                output_dir.push("raptr-output");
             }
         }
     }
@@ -121,12 +115,12 @@ pub fn publish_drafts(path: Option<&String>) {
 
                 let mut file = match File::create(&html_path) {
                     Ok(file) => file,
-                    Err(_err) => panic!("Could not write file"),
+                    Err(err) => panic!("Could not write file because {}", err),
                 };
 
                 match file.write_all(html_output.as_bytes()) {
-                    Ok(_) => println!("Successfully generated file!"),
-                    Err(_err) => eprintln!("Could not generate file: {}", html_path),
+                    Ok(_) => println!("Successfully generated file: {}", html_path),
+                    Err(err) => eprintln!("Could not generate file: {} because {}", html_path, err),
                 }
             }
         }
