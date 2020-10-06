@@ -37,7 +37,7 @@ pub fn handle_arguments<'a>(args: Vec<String>) {
                         }
                     }
                 } else {
-
+                    // TODO: publish to standard output
                 }
             }
             _ => eprintln!("Command not found!"),
@@ -50,13 +50,13 @@ fn print_help() {
     let help_command_string = "\
     Usage:
     
-    raptr hatch - Starts the webinterface
-    raptr hatch <port> - Starts the webinterface at <port> (port is optional)
+    raptr hatch                   Starts the webinterface
+    raptr hatch <port>            Starts the webinterface at <port> (port is optional)
     
-    raptr publish - Genereates HTML file(s) to standard path
-    raptr publish <path> - Generates HTML file(s) to specified path
-    raptr publish web - Generates HTML file(s) to standard webroot
+    raptr publish                 Genereates HTML file(s) to standard path
+    raptr publish <path>          Generates HTML file(s) to specified path
+    raptr publish web             Generates HTML file(s) to standard webroot
     
-    raptr config <option>=<value> - Sets <option> to <value> in config file";
+    raptr config <option>=<value> Sets <option> to <value> in config file";
     println!("{}", help_command_string);
 }
