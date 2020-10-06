@@ -4,6 +4,7 @@ use std::io::prelude::*;
 use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
 use std::fs;
+use comrak;
 
 /// Writes markdown to markdown file in draft directory
 pub fn write_markdown_to_draft(filename: &str, markdown: &str) -> Result<(), ErrorKind> {
@@ -88,5 +89,46 @@ pub fn read_file(name: &str) -> String {
     match fs::read_to_string(Path::new(&path)) {
         Ok(content) => content,
         Err(_err) => String::from("Could not read file! Go back and try again."),
+    }
+}
+
+/// Iterates through draft directory an generates HTML file from every file inside.
+pub fn publish_drafts(path: Option<&String>) {
+    let mut output_dir = PathBuf::new();
+
+    match path {
+        Some(custom_dir) => {
+            output_dir = PathBuf::from(custom_dir)
+        },
+        None => {
+            if let Some(user_dirs) = UserDirs::new() {
+                let mut document_dir = user_dirs.document_dir().unwrap().to_owned();
+                document_dir.push("raptr-output");
+                output_dir = document_dir;
+            }
+        }
+    }
+    
+    let draft_directory = get_draft_directory();
+    if let Ok(dir) = fs::read_dir(draft_directory) {
+        for path in dir {
+            if let Ok(path) = path {
+                let file_name = path.file_name().into_string().unwrap().replace(".md", "");
+                
+                let html_path = format!("{}{}{}", output_dir.display(), &file_name, ".html");
+
+                let html_output = comrak::markdown_to_html(&read_file(&file_name), &comrak::ComrakOptions::default());
+
+                let mut file = match File::create(&html_path) {
+                    Ok(file) => file,
+                    Err(_err) => panic!("Could not write file"),
+                };
+
+                match file.write_all(html_output.as_bytes()) {
+                    Ok(_) => println!("Successfully generated file!"),
+                    Err(_err) => eprintln!("Could not generate file: {}", html_path),
+                }
+            }
+        }
     }
 }

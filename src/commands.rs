@@ -1,4 +1,5 @@
 use crate::web;
+use crate::io;
 
 #[macro_export]
 macro_rules! vec_of_strings {
@@ -23,21 +24,10 @@ pub fn handle_arguments<'a>(args: Vec<String>) {
             }
             "publish" => {
                 if let Some(arg) = args.next() {
-                    match arg.as_str() {
-                        "web" => {
-                            if let Some(arg) = args.next() {
-                                let webroot = arg;
-                                // TODO: publish with extra webroot given
-                            } else {
-                                // TODO: publish with no extra webroot given
-                            }
-                        }
-                        _ => {
-                            // TODO: publish to specific output directory
-                        }
-                    }
+                    let output_path = arg;
+                    io::publish_drafts(Some(output_path));
                 } else {
-                    // TODO: publish to standard output
+                    io::publish_drafts(None);
                 }
             }
             _ => eprintln!("Command not found!"),
@@ -55,7 +45,6 @@ fn print_help() {
     
     raptr publish                 Genereates HTML file(s) to standard path
     raptr publish <path>          Generates HTML file(s) to specified path
-    raptr publish web             Generates HTML file(s) to standard webroot
     
     raptr config <option>=<value> Sets <option> to <value> in config file";
     println!("{}", help_command_string);
