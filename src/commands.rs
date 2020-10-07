@@ -25,9 +25,15 @@ pub fn handle_arguments<'a>(args: Vec<String>) {
             "publish" => {
                 if let Some(arg) = args.next() {
                     let output_path = arg;
-                    io::publish_drafts(Some(output_path));
+                    match io::publish_drafts(Some(output_path)) {
+                        Ok(_) => println!("Generated all files successfuly!"),
+                        Err(err) => eprintln!("Error while generating files: {:?}", err),
+                    }
                 } else {
-                    io::publish_drafts(None);
+                    match io::publish_drafts(None) {
+                        Ok(_) => println!("Generated all files sucessfuly!"),
+                        Err(err) => eprintln!("Error while generating files: {:?}", err),
+                    }
                 }
             }
             _ => eprintln!("Command not found!"),

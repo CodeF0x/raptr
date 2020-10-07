@@ -1,31 +1,19 @@
 use directories::UserDirs;
 use std::fs::File;
 use std::io::prelude::*;
-use std::io::ErrorKind;
 use std::path::{Path, PathBuf};
+use std::io::Error;
 use std::fs;
 use comrak;
 
 /// Writes markdown to markdown file in draft directory
-pub fn write_markdown_to_draft(filename: &str, markdown: &str) -> Result<(), ErrorKind> {
+pub fn write_markdown_to_draft(filename: &str, markdown: &str) -> Result<(), Error> {
     let mut file_path = get_default_draft_directory();
     file_path.push(filename);
 
-    let mut file = match File::create(&file_path) {
-        Ok(file) => file,
-        Err(err) => {
-            eprintln!("Could not create file because: {}", err);
-            return Err(err.kind());
-        }
-    };
+    let mut file = File::create(&file_path)?;
 
-    match file.write_all(markdown.as_bytes()) {
-        Ok(_) => Ok(()),
-        Err(err) => {
-            eprintln!("Could not save draft because: {}", err);
-            return Err(err.kind());
-        }
-    }
+    Ok(file.write_all(markdown.as_bytes())?)
 }
 
 /// Checks if working criteria is met.
@@ -102,19 +90,15 @@ pub fn get_files() -> Vec<String> {
 }
 
 /// Reads single file by file name.
-pub fn read_file(name: &str) -> String {
+pub fn read_file(name: &str) -> Result<String, Error> {
     let draft_directory = get_default_draft_directory();
     let path = format!("{}/{}", draft_directory.display().to_string(), name);
 
-    println!("Path: {}", &path);
-    match fs::read_to_string(Path::new(&path)) {
-        Ok(content) => content,
-        Err(_err) => String::from("Could not read file! Go back and try again."),
-    }
+    Ok(fs::read_to_string(Path::new(&path))?)
 }
 
 /// Iterates through draft directory an generates HTML file from every file inside.
-pub fn publish_drafts(path: Option<&String>) {
+pub fn publish_drafts(path: Option<&String>) -> Result<(), Error> {
     let mut output_dir = PathBuf::new();
 
     match path {
@@ -136,7 +120,7 @@ pub fn publish_drafts(path: Option<&String>) {
             if let Ok(path) = path {
                 let file_name = path.file_name().into_string().unwrap();
                 
-                let html_output = comrak::markdown_to_html(&read_file(&file_name), &comrak::ComrakOptions::default());
+                let html_output = comrak::markdown_to_html(&read_file(&file_name).unwrap(), &comrak::ComrakOptions::default());
                 
                 let html_path = format!(
                     "{}/{}{}", 
@@ -144,16 +128,12 @@ pub fn publish_drafts(path: Option<&String>) {
                     &file_name.replace(".md", ""), 
                     ".html");
 
-                let mut file = match File::create(&html_path) {
-                    Ok(file) => file,
-                    Err(err) => panic!("Could not write file {} because {}", &html_path, err),
-                };
+                let mut file = File::create(&html_path)?;
 
-                match file.write_all(html_output.as_bytes()) {
-                    Ok(_) => println!("Successfully generated file: {}", html_path),
-                    Err(err) => eprintln!("Could not generate file: {} because {}", html_path, err),
-                }
+                println!("Generating file: {}", &html_path);
+                file.write_all(html_output.as_bytes())?;
             }
         }
     }
+    Ok(())
 }

@@ -26,7 +26,7 @@ fn submit_file(req: Request) -> Response {
     let markdown = req.form("markdown").unwrap();
     match io::write_markdown_to_draft(filename, markdown) {
         Ok(_) => Response::from_asset("html/success.html"),
-        Err(_err) => Response::from_text("Could not save draft, see console"),
+        Err(err) => Response::from_text(format!("Error while saving draft: {:?}", err)),
     }
 }
 
@@ -50,7 +50,7 @@ fn edit_single_file(req: Request) -> Response {
     let file_content = io::read_file(file_name);
     Response::from_body(
         vial::asset::to_string("/html/edit_file.html").unwrap()
-        .replace("{{ draft_text }}", &file_content)
+        .replace("{{ draft_text }}", &file_content.unwrap())
         .replace("{{ file_name }}", file_name))
 }
 
@@ -60,7 +60,7 @@ fn update_file(req: Request) -> Response {
     let file_content = req.form("markdown").unwrap();
     match io::write_markdown_to_draft(file_name, file_content) {
         Ok(_) => Response::from_asset("html/success.html"),
-        Err(_err) => Response::from_text("Could not save draft, see console."),
+        Err(err) => Response::from_text(format!("Error while saving draft: {:?}", err)),
     }
 }
 
