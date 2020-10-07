@@ -67,6 +67,5 @@ fn update_file(req: Request) -> Response {
 /// Launches server.
 pub fn launch_server(port: u16) {
     let address = format!("{}{}", "localhost:", port);
-    vial::asset_dir!("./static");
     vial::run_with_banner!("raptr startet at {}", address).unwrap();
 }
