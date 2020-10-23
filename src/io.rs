@@ -5,6 +5,7 @@ use std::path::{Path, PathBuf};
 use std::io::Error;
 use std::fs;
 use comrak;
+use crate::constants;
 
 /// Writes markdown to markdown file in draft directory
 pub fn write_markdown_to_draft(filename: &str, markdown: &str) -> Result<(), Error> {
@@ -120,18 +121,23 @@ pub fn publish_drafts(path: Option<&String>) -> Result<(), Error> {
             if let Ok(path) = path {
                 let file_name = path.file_name().into_string().unwrap();
                 
-                let html_output = comrak::markdown_to_html(&read_file(&file_name).unwrap(), &comrak::ComrakOptions::default());
+                let comrak_output = comrak::markdown_to_html(&read_file(&file_name).unwrap(), &comrak::ComrakOptions::default());
+
+                let final_document_string = constants::HTML_BOILERPLATE
+                    .replace("{{ document_name }}", &file_name)
+                    .replace("{{ document_style }}", constants::CSS_BOILERPLATE)
+                    .replace("{{ document_body }}", &comrak_output);
                 
                 let html_path = format!(
                     "{}/{}{}", 
                     output_dir.display(), 
-                    &file_name.replace(".md", ""), 
+                    &file_name.replace(".md", ""),
                     ".html");
 
                 let mut file = File::create(&html_path)?;
 
                 println!("Generating file: {}", &html_path);
-                file.write_all(html_output.as_bytes())?;
+                file.write_all(final_document_string.as_bytes())?;
             }
         }
     }

@@ -3,6 +3,7 @@ use std::env;
 mod commands;
 mod io;
 mod web;
+mod constants;
 
 fn main() {
     io::setup();
