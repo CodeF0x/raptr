@@ -4,7 +4,7 @@ use std::io::prelude::*;
 use std::path::{Path, PathBuf};
 use std::io::Error;
 use std::fs;
-use comrak;
+use comrak::ComrakOptions;
 use crate::constants;
 
 /// Writes markdown to markdown file in draft directory
@@ -115,13 +115,22 @@ pub fn publish_drafts(path: Option<&String>) -> Result<(), Error> {
         }
     }
     
+    
     let draft_directory = get_default_draft_directory();
     if let Ok(dir) = fs::read_dir(draft_directory) {
+
+        let mut parse_options = ComrakOptions::default();
+        parse_options.extension.table = true;
+        parse_options.extension.tasklist = true;
+        parse_options.extension.footnotes = true;
+        parse_options.extension.description_lists = true;
+        parse_options.extension.strikethrough = true;
+
         for path in dir {
             if let Ok(path) = path {
                 let file_name = path.file_name().into_string().unwrap();
                 
-                let comrak_output = comrak::markdown_to_html(&read_file(&file_name).unwrap(), &comrak::ComrakOptions::default());
+                let comrak_output = comrak::markdown_to_html(&read_file(&file_name).unwrap(), &parse_options);
 
                 let final_document_string = constants::HTML_BOILERPLATE
                     .replace("{{ document_name }}", &file_name)
