@@ -1,4 +1,4 @@
-    pub const HTML_BOILERPLATE: &str = "
+pub const HTML_BOILERPLATE: &str = "
     <!doctype html>
     <html>
     <head>
@@ -67,6 +67,24 @@ pub const CSS_BOILERPLATE: &str = "
       }
 
     @media (prefers-color-scheme: light) {
+        body {
+            background: white;
+            color: black;
+        }
 
+        pre {
+            background: #cac8c8;
+            color: black;
+        }
+
+        blockquote {
+            background: #cac8c8;
+            border-left: 10px solid black;
+        }
+
+        blockquote p,
+        blockquote::before {
+            color: black;
+        }
     }
 ";
