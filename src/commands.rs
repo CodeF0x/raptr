@@ -1,4 +1,3 @@
-use crate::web;
 use crate::io;
 
 #[macro_export]
@@ -16,23 +15,32 @@ pub fn handle_arguments<'a>(args: Vec<String>) {
             "" | "help" => {
                 print_help();
             }
-            "hatch" => {
-                if let Some(arg) = args.next() {
-                    port = arg.parse().unwrap();
-                }
-                web::launch_server(port);
-            }
             "publish" => {
                 if let Some(arg) = args.next() {
                     let output_path = arg;
-                    match io::publish_drafts(Some(output_path)) {
-                        Ok(_) => println!("Generated all files successfuly!"),
-                        Err(err) => eprintln!("Error while generating files: {:?}", err),
-                    }
+                    // match io::publish_drafts(Some(output_path)) {
+                    //     Ok(_) => println!("Generated all files successfuly!"),
+                    //     Err(err) => eprintln!("Error while generating files: {:?}", err),
+                    // }
                 } else {
-                    match io::publish_drafts(None) {
-                        Ok(_) => println!("Generated all files sucessfuly!"),
-                        Err(err) => eprintln!("Error while generating files: {:?}", err),
+                    // match io::publish_drafts(None) {
+                    //     Ok(_) => println!("Generated all files sucessfuly!"),
+                    //     Err(err) => eprintln!("Error while generating files: {:?}", err),
+                    // }
+                }
+            }
+            "new" => {
+                if let Some(arg) = args.next() {
+                    if arg == "site" {
+                        if let Some(arg) = args.next() {
+                            let site_name = arg;
+                            match io::create_new_project(site_name) {
+                                Ok(_) => println!("Your new project {} is ready.", site_name),
+                                Err(err) => eprintln!("Could not create new project {}: {:?}", site_name, err),
+                            }
+                        } else {
+                            println!("Please supply a name for your new site.");
+                        }
                     }
                 }
             }
@@ -46,12 +54,11 @@ fn print_help() {
     let help_command_string = "\
     Usage:
     
-    raptr hatch                   Starts the webinterface
-    raptr hatch <port>            Starts the webinterface at <port> (port is optional)
-    
+    raptr new site <name>         Generattes new project with <name>
+
     raptr publish                 Genereates HTML file(s) to standard path
     raptr publish <path>          Generates HTML file(s) to specified path
-    
+
     raptr config <option>=<value> Sets <option> to <value> in config file";
     println!("{}", help_command_string);
 }

@@ -1,1 +1,0 @@
-const simplemde = new SimpleMDE();
