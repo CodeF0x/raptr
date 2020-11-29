@@ -1,2 +1,6 @@
 /target
 .DS_STORE
+# this is the test dir for dev etc.
+/blog
+config.toml
+/templates
