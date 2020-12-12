@@ -1,13 +1,8 @@
 use crate::io;
 use crate::config;
 
-#[macro_export]
-macro_rules! vec_of_strings {
-    ($($x:expr),*) => (vec![$($x.to_string()),*]);
-}
-
 /// Checks if command exists and launches appropriate action.
-pub fn handle_arguments<'a>(args: Vec<String>) {
+pub fn handle_arguments<'a>(args: Vec<String>) -> Result<(), std::io::Error>{
     let mut args = args.iter();
     while let Some(arg) = args.next() {
         match arg.as_str() {
@@ -15,20 +10,13 @@ pub fn handle_arguments<'a>(args: Vec<String>) {
                 print_help();
             }
             "publish" => {
-                if let Some(arg) = args.next() {
-                    let output_path = arg;
-                    // match io::publish_drafts(Some(output_path)) {
-                    //     Ok(_) => println!("Generated all files successfuly!"),
-                    //     Err(err) => eprintln!("Error while generating files: {:?}", err),
-                    // }
+                if let Some(_arg) = args.next() {
+                    // let output_path = arg;
+                    // todo output to specified directory
                 } else {
-                    match config::read_config() {
-                        Ok(config) => match io::register_theme(&config) {
-                            Ok(_) => println!("Super"),
-                            Err(_) => println!("Nicht so super")
-                        }
-                        Err(_err) => eprintln!("Error while generating files:"),
-                    }
+                    let config = config::read_config()?;
+                    io::render_index(&config)?;
+                    io::render_blog(&config)?;
                 }
             }
             "new" => {
@@ -49,6 +37,8 @@ pub fn handle_arguments<'a>(args: Vec<String>) {
             _ => eprintln!("Command not found!"),
         }
     }
+
+    Ok(())
 }
 
 /// Prints the help command.

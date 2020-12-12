@@ -7,7 +7,9 @@ mod commands;
 mod io;
 mod config;
 
-fn main() {
+fn main() -> Result<(), std::io::Error> {
     let args: Vec<String> = env::args().skip(1).collect();
-    commands::handle_arguments(args);
+    commands::handle_arguments(args)?;
+
+    Ok(())
 }

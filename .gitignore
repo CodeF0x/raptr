@@ -4,3 +4,5 @@
 /blog
 config.toml
 /templates
+/drafts
+/output
