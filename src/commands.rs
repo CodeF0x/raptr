@@ -15,6 +15,7 @@ pub fn handle_arguments<'a>(args: Vec<String>) -> Result<(), std::io::Error>{
                     // todo output to specified directory
                 } else {
                     let config = config::read_config()?;
+                    io::copy_theme_files();
                     io::render_index(&config)?;
                     io::render_blog(&config)?;
                 }

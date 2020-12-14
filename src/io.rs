@@ -5,6 +5,7 @@ use std::fs;
 use crate::config::{Config};
 use std::fs::File;
 use comrak::{markdown_to_html, ComrakOptions};
+use fs_extra::dir::{copy, CopyOptions};
 
 /// Creates directories and files for a new project.
 pub fn create_new_project(project_name: &str) -> Result<(), Error> {
@@ -21,15 +22,22 @@ pub fn create_new_project(project_name: &str) -> Result<(), Error> {
     Ok(())
 }
 
+/// Copies assets etc. to output path
+pub fn copy_theme_files() {
+    let mut options = CopyOptions::new();
+    options.overwrite = true;
+    let _ = copy("templates/default/assets", "output", &options).unwrap();
+}
+
 /// Renders the index page.
 pub fn render_index(config: &Config) -> Result<(), Error> {
     #[derive(TemplateOnce)]
     #[template(path = "default/index.stpl")]
-    struct IndexPage<'a> {
+    struct Index<'a> {
         data: &'a Config
     }
 
-    let ctx = IndexPage {
+    let ctx = Index {
         data: config
     };
 
@@ -50,7 +58,7 @@ pub fn render_blog(config: &Config) -> Result<(), Error> {
     parse_options.extension.strikethrough = true;
 
     #[derive(TemplateOnce)]
-    #[template(path = "default/blog.stpl")]
+    #[template(path = "default/partials/blog.stpl")]
     struct BlogPage {
         text: String
     };
