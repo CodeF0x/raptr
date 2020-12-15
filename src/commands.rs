@@ -2,7 +2,7 @@ use crate::io;
 use crate::config;
 
 /// Checks if command exists and launches appropriate action.
-pub fn handle_arguments<'a>(args: Vec<String>) -> Result<(), std::io::Error>{
+pub fn handle_arguments<'a>(args: Vec<String>) {
     let mut args = args.iter();
     while let Some(arg) = args.next() {
         match arg.as_str() {
@@ -14,10 +14,31 @@ pub fn handle_arguments<'a>(args: Vec<String>) -> Result<(), std::io::Error>{
                     // let output_path = arg;
                     // todo output to specified directory
                 } else {
-                    let config = config::read_config()?;
+                    let config = match config::read_config() {
+                        Ok(config) => config,
+                        Err(reason) => {
+                            eprintln!("{}", reason);
+                            return;
+                        }
+                    };
+
                     io::copy_theme_files();
-                    io::render_index(&config)?;
-                    io::render_blog(&config)?;
+
+                    match io::render_blog() {
+                        Ok(_) => {},
+                        Err(reason) => {
+                            eprintln!("{}", reason);
+                            return;
+                        }
+                    };
+                    
+                    match io::render_index(&config) {
+                        Ok(_) => {},
+                        Err(reason) => {
+                            eprintln!("{}", reason);
+                            return;
+                        }
+                    };
                 }
             }
             "new" => {
@@ -38,8 +59,6 @@ pub fn handle_arguments<'a>(args: Vec<String>) -> Result<(), std::io::Error>{
             _ => eprintln!("Command not found!"),
         }
     }
-
-    Ok(())
 }
 
 /// Prints the help command.

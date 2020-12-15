@@ -30,7 +30,7 @@ pub fn copy_theme_files() {
 }
 
 /// Renders the index page.
-pub fn render_index(config: &Config) -> Result<(), Error> {
+pub fn render_index(config: &Config) -> Result<(), String> {
     #[derive(TemplateOnce)]
     #[template(path = "default/index.stpl")]
     struct Index<'a> {
@@ -41,15 +41,24 @@ pub fn render_index(config: &Config) -> Result<(), Error> {
         data: config
     };
 
-    let rendered_output = ctx.render_once().unwrap();
-    let mut index_file = File::create("output/index.html")?;
-    index_file.write_all(rendered_output.as_bytes())?;
+    let error_message = String::from("Could not render index.html: ");
 
+    let rendered_output = ctx.render_once().unwrap();
+    let mut index_file = match File::create("output/index.html") {
+        Ok(index_file) => index_file,
+        Err(err) => return Err(format!("{}{}", error_message, err))
+    };
+    match index_file.write_all(rendered_output.as_bytes()) {
+        Ok(_) => {},
+        Err(err) => return Err(format!("{}{}", error_message, err))
+    };
+
+    println!("Generated index.html.");
     Ok(())
 }
 
 /// Renders every blog post.
-pub fn render_blog(config: &Config) -> Result<(), Error> {
+pub fn render_blog() -> Result<(), String> {
     let mut parse_options = ComrakOptions::default();
     parse_options.extension.table = true;
     parse_options.extension.tasklist = true;
@@ -64,9 +73,21 @@ pub fn render_blog(config: &Config) -> Result<(), Error> {
     };
 
     if let Ok(drafts) = fs::read_dir("drafts") {
+        // todo: This is ugly, change!!
+        let mut drafts_avaiable = false;
+
+        println!("Rendering blog posts...");
         for path in drafts {
+            drafts_avaiable = true;
+
             if let Ok(path) = path {
-                let markdown = fs::read_to_string(path.path())?;
+                let file_name = path.file_name().into_string().unwrap();
+                let error_message = format!("Error: Could not render file {}: ", path.file_name().into_string().unwrap());
+
+                let markdown = match fs::read_to_string(path.path()) {
+                    Ok(markdown) => markdown,
+                    Err(err) => return Err(format!("{}{:?}", error_message, err)),
+                };
                 let html = markdown_to_html(&markdown, &parse_options);
         
                 let ctx = BlogPage {
@@ -74,15 +95,28 @@ pub fn render_blog(config: &Config) -> Result<(), Error> {
                 };
         
                 let result = ctx.render_once().unwrap();
-                let mut blog_file = File::create(
-                    format!("output/posts/{}.html", path.file_name().into_string().unwrap())
-                )?;
-                blog_file.write_all(result.as_bytes())?;
+                let mut blog_file = match File::create(
+                    format!("output/posts/{}.html", file_name)
+                ) {
+                    Ok(blog_file) => blog_file,
+                    Err(err) => return Err(format!("{}{:?}", error_message, err))
+                };
+                match blog_file.write_all(result.as_bytes()) {
+                    Ok(_) => println!("Generated file {}", file_name),
+                    Err(err) => return Err(format!("{}{:?}", error_message, err))
+                };
             }
         }
+        
+        if !drafts_avaiable {
+            println!("Warning: You don't have any drafts, therefore no blog posts have been generated.");
+            return Ok(());
+        }
+
+    } else {
+        return Err(String::from("Error: Cant't find drafts directory. Aborting."));
     }
-
-
     
+    println!("Generated blog posts.");
     Ok(())
 }
