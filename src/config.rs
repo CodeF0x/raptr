@@ -3,26 +3,16 @@ use chrono::prelude::*;
 
 #[derive(Deserialize)]
 pub struct Config {
-    pub index: Index,
-    pub meta: Meta
+    pub meta: SitewideMetaData,
 }
 
 #[derive(Deserialize)]
-pub struct Index {
-    pub headline: String,
-    pub sub_headline: String,
-    pub first_line: String,
-    pub second_line: String
-}
-
-#[derive(Deserialize)]
-pub struct Meta {
-    pub tab_title: String,
-    pub copyright: String,
-    pub description: String,
+pub struct SitewideMetaData {
+    pub last_generated_date: String,
     pub keywords: Vec<String>,
-    pub last_edited_date: Option<String>,
-    pub author: String
+    pub description: String,
+    pub copyright: String,
+    pub page_name: String,
 }
 
 pub fn read_config() -> Result<Config, String> {
@@ -39,7 +29,8 @@ pub fn read_config() -> Result<Config, String> {
         Ok(config) => config,
         Err(_) => return Err(String::from("Error: Could not parse config.toml file. Is it valid?")),
     };
-    config.meta.last_edited_date = Utc::today().format("%d.%m.%Y").to_string().into();
-
+    config.meta.last_generated_date = Utc::today().format("%d.%m.%Y").to_string();
+    // config.is_blog = false;
+    
     Ok(config)
 }

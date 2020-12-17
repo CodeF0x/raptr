@@ -13,6 +13,8 @@ pub fn handle_arguments<'a>(args: Vec<String>) {
                 if let Some(_arg) = args.next() {
                     // let output_path = arg;
                     // todo output to specified directory
+                    println!("Sorry, this is not implemented yet! :( Please use raptr publish instead.");
+                    return;
                 } else {
                     let config = match config::read_config() {
                         Ok(config) => config,
@@ -24,7 +26,7 @@ pub fn handle_arguments<'a>(args: Vec<String>) {
 
                     io::copy_theme_files();
 
-                    match io::render_blog() {
+                    match io::render_blog(&config) {
                         Ok(_) => {},
                         Err(reason) => {
                             eprintln!("{}", reason);
@@ -51,7 +53,17 @@ pub fn handle_arguments<'a>(args: Vec<String>) {
                                 Err(err) => eprintln!("Could not create new project {}: {:?}", site_name, err),
                             }
                         } else {
-                            println!("Please supply a name for your new site.");
+                            println!("Error: Please supply a name for your new site.");
+                        }
+                    } else if arg == "draft" {
+                        if let Some(arg) = args.next() {
+                            let draft_name = arg;
+                            match io::create_new_draft(draft_name) {
+                                Ok(_) => println!("Created new draft {}.md.", draft_name),
+                                Err(err) => eprintln!("Could not create new draft {}.md: {:?}", draft_name, err),
+                            }
+                        } else {
+                            println!("Error: Please supply a name for your new draft.");
                         }
                     }
                 }
@@ -66,11 +78,10 @@ fn print_help() {
     let help_command_string = "\
     Usage:
     
-    raptr new site <name>         Generates new project with <name>
+    raptr new site <name>         Generates new project with <name>              Example: raptr new site my-awesome-blog
 
-    raptr publish                 Generates HTML file(s) to standard path
-    raptr publish <path>          Generates HTML file(s) to specified path
-
-    raptr config <option>=<value> Sets <option> to <value> in config file";
+    raptr publish                 Generates HTML file(s) to standard path        Example: raptr publish
+    raptr publish <path>          Generates HTML file(s) to specified path       Exmaple: raptr publish /home/juniper/blog-files
+    ";
     println!("{}", help_command_string);
 }
