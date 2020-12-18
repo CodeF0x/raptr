@@ -2,7 +2,7 @@ use crate::io;
 use crate::config;
 
 /// Checks if command exists and launches appropriate action.
-pub fn handle_arguments<'a>(args: Vec<String>) {
+pub fn handle_arguments<'a>(args: Vec<String>) -> Result<(), String> {
     let mut args = args.iter();
     while let Some(arg) = args.next() {
         match arg.as_str() {
@@ -14,33 +14,12 @@ pub fn handle_arguments<'a>(args: Vec<String>) {
                     // let output_path = arg;
                     // todo output to specified directory
                     println!("Sorry, this is not implemented yet! :( Please use raptr publish instead.");
-                    return;
+                    return Ok(());
                 } else {
-                    let config = match config::read_config() {
-                        Ok(config) => config,
-                        Err(reason) => {
-                            eprintln!("{}", reason);
-                            return;
-                        }
-                    };
-
-                    io::copy_theme_files();
-
-                    match io::render_blog(&config) {
-                        Ok(_) => {},
-                        Err(reason) => {
-                            eprintln!("{}", reason);
-                            return;
-                        }
-                    };
-                    
-                    match io::render_index(&config) {
-                        Ok(_) => {},
-                        Err(reason) => {
-                            eprintln!("{}", reason);
-                            return;
-                        }
-                    };
+                    let config = config::read_config()?;
+                    io::copy_theme_files()?;
+                    io::render_blog(&config)?;
+                    io::render_index(&config)?;
                 }
             }
             "new" => {
@@ -71,6 +50,8 @@ pub fn handle_arguments<'a>(args: Vec<String>) {
             _ => eprintln!("Command not found!"),
         }
     }
+
+    Ok(())
 }
 
 /// Prints the help command.

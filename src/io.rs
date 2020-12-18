@@ -36,10 +36,18 @@ pub fn create_new_draft(draft_name: &str) -> Result<(), Error> {
 }
 
 /// Copies assets etc. to output path.
-pub fn copy_theme_files() {
+pub fn copy_theme_files() -> Result<(), String> {
+    if let Ok(mut entries) = fs::read_dir("templates") {
+        if entries.next().is_none() {
+            return Err(String::from("You don't have any themes in your templates directory. Aborting."));
+        }
+    }
+
     let mut options = CopyOptions::new();
     options.overwrite = true;
     let _ = copy("templates/default/assets", "output", &options).unwrap();
+
+    Ok(())
 }
 
 /// Renders the index page.
@@ -105,7 +113,13 @@ pub fn render_blog(config: &Config) -> Result<(), String> {
             drafts_avaiable = true;
 
             if let Ok(path) = path {
+
                 let file_name = path.file_name().into_string().unwrap();
+
+                if file_name.starts_with(".") {
+                    continue;
+                }
+
                 let error_message = format!("Error: Could not render file {}: ", path.file_name().into_string().unwrap());
 
                 let draft_content = match fs::read_to_string(path.path()) {
