@@ -47,6 +47,15 @@ pub fn handle_arguments<'a>(args: Vec<String>) -> Result<(), String> {
                     }
                 }
             }
+            "theme" => {
+                if let Some(arg) = args.next() {
+                    let theme_name = arg;
+                    config::change_theme(theme_name)?;
+                } else {
+                    println!("Error: Please provide a theme name.");
+                    return Ok(())
+                }
+            }
             _ => eprintln!("Command not found!"),
         }
     }

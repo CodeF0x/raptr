@@ -1,5 +1,7 @@
 use serde_derive::Deserialize;
 use chrono::prelude::*;
+use std::fs::File;
+use std::fs;
 
 #[derive(Deserialize)]
 pub struct Config {
@@ -33,4 +35,24 @@ pub fn read_config() -> Result<Config, String> {
     // config.is_blog = false;
     
     Ok(config)
+}
+
+pub fn change_theme(theme_name: &str) -> Result<(), String> {
+    let theme_file_exists = std::path::Path::new(".theme").exists();
+    let err_message = "Could not change theme:";
+
+    if theme_file_exists {
+        match fs::write(".theme", theme_name) {
+            Ok(_) => {},
+            Err(err) => return Err(format!("Could not change theme: {}", err))
+        }
+    } else {
+        let theme_file = match File::create(".theme") {
+            Ok(theme_file) => theme_file,
+            Err(err) => return Err(format!("{} {}", err_message, err))
+        };
+        theme_file.write_all(theme_name.as_bytes());
+    }
+
+    Ok(())
 }
