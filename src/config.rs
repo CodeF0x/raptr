@@ -38,21 +38,43 @@ pub fn read_config() -> Result<Config, String> {
 }
 
 pub fn change_theme(theme_name: &str) -> Result<(), String> {
-    let theme_file_exists = std::path::Path::new(".theme").exists();
+    let theme_file_path = std::path::Path::new(".theme");
+    let theme_file_exists = theme_file_path.exists();
+    let theme_dir = std::path::Path::new("./templates");
     let err_message = "Could not change theme:";
 
     if theme_file_exists {
-        match fs::write(".theme", theme_name) {
-            Ok(_) => {},
-            Err(err) => return Err(format!("Could not change theme: {}", err))
-        }
-    } else {
-        let theme_file = match File::create(".theme") {
-            Ok(theme_file) => theme_file,
-            Err(err) => return Err(format!("{} {}", err_message, err))
+        let theme = match fs::read_to_string(theme_file_path) {
+            Ok(theme) => theme,
+            Err(err) => {
+                if err.kind() != std::io::ErrorKind::NotFound {
+                    return Err(format!("{}: {}", err_message, err));
+                } else {
+                    return Err(String::from("whatever"));
+                }
+            }
         };
-        theme_file.write_all(theme_name.as_bytes());
-    }
 
+        match fs::write(theme_file_path, theme_name) {
+            Ok(_) => {},
+            Err(err) => return Err(format!("{}: {}", err_message, err))
+        };
+    } else {
+        match fs::write(theme_file_path, theme_name.as_bytes()) {
+            Ok(_) => {},
+            Err(err) => return Err(format!("{}: {}", err_message, err))
+        }
+
+        let available_templates = fs::read_dir(theme_dir).unwrap().count();
+        match available_templates {
+            0 | 1 => {
+                return Err(String::from("Please add at least two themes."));
+            },
+            _ => {
+                fs::rename(theme_name, "default");
+            }
+        }
+
+    }
     Ok(())
 }
