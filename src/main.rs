@@ -37,10 +37,21 @@ fn main() {
             .help("Shows detailed errors and logging messages")
             .takes_value(false)
         )
+        .arg(
+            Arg::with_name("draft")
+            .short("d")
+            .long("draft")
+            .value_name("DRAFT_NAME")
+            .help("Creates a new draft")
+            .takes_value(true)
+        )
         .get_matches();
         
+    let config = Config::new();
+
     let verbosity_active = matches.is_present("verbosity");
     let verbosity_string = if verbosity_active { 
+        println!("verbosity active");
         String::from("") 
     } else { 
         String::from("Try again with -v / --verbosity to display a more detailed error") 
@@ -58,11 +69,17 @@ fn main() {
         };
     }
 
-    if matches.is_present("publish") {
-        let config = Config::new();
+    if let Some(draft_name) = matches.value_of("draft") {
+        project::create_new_draft(&config.theme, &draft_name);
+    }
+
+    // use occurrences_of because we use default_value above and so is_present
+    // will still return true.
+    if matches.occurrences_of("publish") == 1 {
+        println!("pubish");
         let render_engine = RenderEngine::new(&config.theme);
 
-        project::prepate_output_dir(&config.theme);
+        project::prepare_output_dir(&config.theme);
         render_engine.render_index(&config);
         render_engine.render_blog_posts(&config);
     }

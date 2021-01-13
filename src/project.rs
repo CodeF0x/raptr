@@ -1,6 +1,7 @@
 use std::fs;
 use std::io::Error;
 use std::path::Path;
+use std::fs::File;
 use fs_extra::dir::{copy, CopyOptions};
 
 pub fn create_project(project_name: &str) -> Result<(), Error> {
@@ -17,7 +18,7 @@ pub fn create_project(project_name: &str) -> Result<(), Error> {
     Ok(())
 }
 
-pub fn prepate_output_dir(theme_name: &str) {
+pub fn prepare_output_dir(theme_name: &str) {
     if let Ok(mut entries) = fs::read_dir("templates") {
         if entries.next().is_none() {
             eprintln!("You don't have any themes installed. Please add a theme to the themes directory in your project root.");
@@ -30,4 +31,21 @@ pub fn prepate_output_dir(theme_name: &str) {
     let _ = copy(
         format!("themes/{}/assets", theme_name), "output", &options
     ).unwrap();
+}
+
+pub fn create_new_draft(theme_name: &str, draft_name: &str) {
+    let draft_path = Path::new("drafts").join(
+        format!("{}.md", draft_name)
+    );
+
+    if draft_path.exists() {
+        eprintln!("A draft with that name already exists.");
+        std::process::exit(1);
+    }
+
+    let _draft_file = File::create(&draft_path).expect("Could not create new draft.");
+    fs::copy(
+        format!("themes/{}/archetypes/post.md", &theme_name),
+        &draft_path
+    ).expect("Could not copy archetype to new draft file");
 }
