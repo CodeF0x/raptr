@@ -2,9 +2,20 @@ use tera::{Tera, Context};
 use crate::config::Config;
 use std::fs::File;
 use std::io::{prelude::*};
+use std::fs;
+use serde_derive::Deserialize;
 
 pub struct RenderEngine {
     pub tera: Tera
+}
+
+#[derive(Deserialize)]
+struct BlogMetaData {
+    title: String,
+    author: String,
+    author_link: String,
+    draft: bool,
+    date: String
 }
 
 impl RenderEngine {
@@ -29,7 +40,21 @@ impl RenderEngine {
     }
 
     pub fn render_blog_posts(&self, config: &Config) {
+        let all_drafts = fs::read_dir("./drafts").expect("Could not read drafts directory.");
 
+        for draft in all_drafts {
+            let path = draft.unwrap().path();
+            let draft_content = match fs::read_to_string(&path) {
+                Ok(content) => content,
+                Err(_) => {
+                    eprintln!("Could not read draft {:?}", path);
+                    std::process::exit(1);
+                }
+            };
+
+            let meta_data_str = draft_content.split("---").collect();
+            let meta_data: BlogMetaData = toml::from_str(meta_data_str).unwrap();
+        }
     }
 }
 

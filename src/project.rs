@@ -48,4 +48,5 @@ pub fn create_new_draft(theme_name: &str, draft_name: &str) {
         format!("themes/{}/archetypes/post.md", &theme_name),
         &draft_path
     ).expect("Could not copy archetype to new draft file");
+    println!("Created a new draft {}", draft_name);
 }

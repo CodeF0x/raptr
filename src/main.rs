@@ -76,7 +76,6 @@ fn main() {
     // use occurrences_of because we use default_value above and so is_present
     // will still return true.
     if matches.occurrences_of("publish") == 1 {
-        println!("pubish");
         let render_engine = RenderEngine::new(&config.theme);
 
         project::prepare_output_dir(&config.theme);
