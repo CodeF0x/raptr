@@ -1,6 +1,7 @@
 /target
 .DS_STORE
 .gitmodules
+/.idea
 # this is the test dir for dev etc.
 /blog
 config.toml

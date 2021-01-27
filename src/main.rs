@@ -1,7 +1,7 @@
 mod project;
-mod errors;
 mod config;
 mod render;
+mod errors;
 
 use clap::{Arg, App};
 use config::Config;
@@ -80,6 +80,6 @@ fn main() {
 
         project::prepare_output_dir(&config.theme);
         render_engine.render_index(&config);
-        render_engine.render_blog_posts(&config);
+        render_engine.render_blog_posts();
     }
 }
