@@ -61,6 +61,10 @@ impl RenderEngine {
             let path = draft.unwrap().path();
             let path_str = &path.to_str().unwrap();
 
+            if !path_str.ends_with(".md") {
+                continue;
+            }
+
             let draft_content = match fs::read_to_string(&path) {
                 Ok(content) => content,
                 Err(err) => {
@@ -78,6 +82,10 @@ impl RenderEngine {
                     exit(1);
                 }
             };
+
+            if context.draft {
+                continue;
+            }
 
             let rendered_html = self.tera.render("partials/blog.html", &Context::from_serialize(&context).unwrap()).unwrap();
             let file_name = path.file_name().unwrap().to_str().unwrap().replace(".md", ".html");
