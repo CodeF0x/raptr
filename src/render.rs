@@ -7,6 +7,7 @@ use serde_derive::{Deserialize, Serialize};
 use comrak::{markdown_to_html, ComrakOptions};
 use crate::errors;
 use std::process::exit;
+use std::path::Path;
 
 pub struct RenderEngine {
     pub tera: Tera
@@ -36,25 +37,51 @@ impl RenderEngine {
         RenderEngine { tera }
     }
 
-    pub fn render_index(&self, config: &Config) {
+    pub fn render_index(&self, config: &Config, output_dir: &str) {
+        let out_path = Path::new(output_dir);
+        if !out_path.exists() {
+            match fs::create_dir(output_dir) {
+                Ok(_) => println!("Created new directory {}", output_dir),
+                Err(err) => {
+                    errors::display_io_error(err.kind, output_dir);
+                    exit(1);
+                }
+            }
+        }
+
         let rendered_html = self.tera.render("index.html", &Context::from_serialize(&config).unwrap()).unwrap();
-        let mut index_file = match File::create("output/index.html") {
+
+        out_path.join("index.html");
+        let out_path_str = out_path.to_str().unwrap();
+        let mut index_file = match File::create(out_path) {
           Ok(index_file) => index_file,
           Err(err) => {
-              errors::display_io_error(err.kind(), "output/index.html");
+              errors::display_io_error(err.kind(), out_path_str);
               exit(1);
           }
         };
         match index_file.write_all(rendered_html.as_bytes()) {
             Ok(_) => println!("Generated index.html."),
             Err(err) => {
-                errors::display_io_error(err.kind(), "output/index.html");
+                errors::display_io_error(err.kind(), out_path_str);
                 exit(1);
             }
         };
     }
 
-    pub fn render_blog_posts(&self) {
+    pub fn render_blog_posts(&self, output_dir: &str) {
+        let out_path = Path::new(output_dir).join("posts");
+        if !out_path.exists() {
+            match fs::create_dir(out_path) {
+                Ok(_) => {},
+                Err(err) => {
+                    let out_path_str = out_path.to_str().unwrap();
+                    errors::display_io_error(err.kind(), out_path_str);
+                    exit(1);
+                }
+            }
+        }
+
         let all_drafts = fs::read_dir("./drafts").unwrap();
 
         for draft in all_drafts {
@@ -88,6 +115,8 @@ impl RenderEngine {
             }
 
             let rendered_html = self.tera.render("partials/blog.html", &Context::from_serialize(&context).unwrap()).unwrap();
+
+
             let file_name = path.file_name().unwrap().to_str().unwrap().replace(".md", ".html");
             let mut blog_file = match File::create(
                 format!("output/posts/{}", &file_name)

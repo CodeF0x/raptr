@@ -76,10 +76,11 @@ fn main() {
     // use occurrences_of because we use default_value above and so is_present
     // will still return true.
     if matches.occurrences_of("publish") == 1 {
+        let output_dir = matches.value_of("publish").unwrap_or("output");
         let render_engine = RenderEngine::new(&config.theme);
 
         project::prepare_output_dir(&config.theme);
-        render_engine.render_index(&config);
-        render_engine.render_blog_posts();
+        render_engine.render_index(&config, output_dir);
+        render_engine.render_blog_posts(output_dir);
     }
 }
