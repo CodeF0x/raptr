@@ -2,6 +2,7 @@
 .DS_STORE
 .gitmodules
 /.idea
+/.vscode
 # this is the test dir for dev etc.
 /blog
 config.toml

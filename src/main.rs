@@ -10,7 +10,7 @@ use render::RenderEngine;
 fn main() {
     let matches = App::new("raptr")
         .version("0.1.0")
-        .about("An experimental blogging engine")
+        .about("An opinionated blogging engine")
         .author("Tobias \"CodeF0x\" Oettl <contact@codef0x.dev>")
         .arg(
             Arg::with_name("new")
@@ -47,13 +47,10 @@ fn main() {
         .get_matches();
 
     let verbose = matches.occurrences_of("verbosity") == 1;
-    let config = Config::new();
+    let config = Config::new(verbose);
 
     if let Some(project_name) = matches.value_of("new") {
-        match project::create_project(&project_name) {
-            Ok(_) => println!("Created your new project {}", project_name),
-            Err(err) => errors::display_io_error(err, &project_name, verbose)
-        };
+        project::create_project(&project_name, verbose);
     }
 
     if let Some(draft_name) = matches.value_of("draft") {
@@ -66,8 +63,8 @@ fn main() {
         let output_dir = matches.value_of("publish").unwrap_or("output");
         let render_engine = RenderEngine::new(&config.theme);
 
-        project::prepare_output_dir(&config.theme);
-        render_engine.render_index(&config, output_dir, verbose);
-        render_engine.render_blog_posts(output_dir, verbose);
+        project::prepare_output_dir(&config.theme, output_dir, verbose);
+        let links = render_engine.render_blog_posts(output_dir, verbose);
+        render_engine.render_index(&config, output_dir, links, verbose);
     }
 }

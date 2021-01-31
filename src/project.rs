@@ -1,35 +1,56 @@
 use std::fs;
-use std::io::Error;
 use std::path::Path;
 use std::fs::File;
 use fs_extra::dir::{copy, CopyOptions};
+use crate::errors;
+use std::process::exit;
 
-pub fn create_project(project_name: &str) -> Result<(), Error> {
+pub fn create_project(project_name: &str, verbose: bool) {
     let root_dir = Path::new("./").join(&project_name);
-    fs::create_dir(&root_dir)?;
+    match fs::create_dir(&root_dir) {
+        Ok(_) => {},
+        Err(err) => {
+            errors::display_io_error(err, project_name, verbose);
+            exit(1);
+        }
+    }
 
     let sub_dirs = vec!["drafts", "output", "themes", "output/posts"];
 
     for dir in sub_dirs {
         let sub_dir = root_dir.join(dir);
-        fs::create_dir(sub_dir)?;
+        match fs::create_dir(sub_dir) {
+            Ok(_) => {},
+            Err(err) => {
+                errors::display_io_error(err, project_name,  verbose);
+                exit(1);
+            }
+        }
     }
-
-    Ok(())
 }
 
-pub fn prepare_output_dir(theme_name: &str) {
+pub fn prepare_output_dir(theme_name: &str, output_dir: &str, verbose: bool) {
     if let Ok(mut entries) = fs::read_dir("templates") {
         if entries.next().is_none() {
             eprintln!("You don't have any themes installed. Please add a theme to the themes directory in your project root.");
-            std::process::exit(1);
+            exit(1);
+        }
+    }
+
+    if !Path::new(output_dir).exists() {
+        match fs::create_dir_all(output_dir) {
+            Ok(_) => {},
+            Err(err) => {
+                errors::display_io_error(err, output_dir, verbose);
+                exit(1);
+            }
         }
     }
 
     let mut options = CopyOptions::new();
     options.overwrite = true;
     let _ = copy(
-        format!("themes/{}/assets", theme_name), "output", &options
+        format!("themes/{}/assets", theme_name), output_dir, &options
     ).unwrap();
 }
 
@@ -40,7 +61,7 @@ pub fn create_new_draft(theme_name: &str, draft_name: &str) {
 
     if draft_path.exists() {
         eprintln!("A draft with that name already exists.");
-        std::process::exit(1);
+        exit(1);
     }
 
     let _draft_file = File::create(&draft_path).expect("Could not create new draft.");

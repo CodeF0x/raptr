@@ -1,6 +1,5 @@
 // use std::fmt;
-use std::io::{ErrorKind};
-use std::error::Error;
+use std::io::ErrorKind;
 
 /**
 #[derive(Debug)]
@@ -32,6 +31,4 @@ pub fn display_io_error(error: std::io::Error, path: &str, verbose: bool) {
     } else {
         println!("Run with -v for a more detailed error message.");
     }
-
-    std::process::exit(1);
 }

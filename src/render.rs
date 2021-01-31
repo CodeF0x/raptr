@@ -19,7 +19,15 @@ struct BlogMetaData {
     author: String,
     author_link: String,
     date: String,
+    keywords: Vec<String>,
+    description: String,
     draft: bool
+}
+
+#[derive(Deserialize, Serialize)]
+pub struct BlogPost {
+    title: String,
+    url: String
 }
 
 impl RenderEngine {
@@ -37,7 +45,7 @@ impl RenderEngine {
         RenderEngine { tera }
     }
 
-    pub fn render_index(&self, config: &Config, output_dir: &str, verbose: bool) {
+    pub fn render_index(&self, config: &Config, output_dir: &str, links: Vec<BlogPost>, verbose: bool) {
         let mut out_path = PathBuf::from(output_dir);
         if !out_path.exists() {
             match fs::create_dir_all(output_dir) {
@@ -49,7 +57,9 @@ impl RenderEngine {
             }
         }
 
-        let rendered_html = self.tera.render("index.html", &Context::from_serialize(&config).unwrap()).unwrap();
+        let mut tera_context = Context::from_serialize(&config).unwrap();
+        tera_context.insert("blog_posts", &links);
+        let rendered_html = self.tera.render("index.html", &tera_context).unwrap();
 
         out_path.push("index.html");
         let out_path_str = out_path.to_str().unwrap();
@@ -69,7 +79,9 @@ impl RenderEngine {
         };
     }
 
-    pub fn render_blog_posts(&self, output_dir: &str, verbose: bool) {
+    pub fn render_blog_posts(&self, output_dir: &str, verbose: bool) -> Vec<BlogPost>{
+        let mut rendered_posts: Vec<BlogPost> = vec![];
+
         let out_path = Path::new(output_dir).join("posts");
         if !out_path.exists() {
             match fs::create_dir_all(&out_path) {
@@ -113,8 +125,13 @@ impl RenderEngine {
             if context.draft {
                 continue;
             }
-            let rendered_html = self.tera.render("partials/blog.html", &Context::from_serialize(&context).unwrap()).unwrap();
 
+            let html_str = split_draft[2];
+            let blog_html = markdown_to_html(html_str, &ComrakOptions::default());
+            let mut tera_context = Context::from_serialize(&context).unwrap();
+            tera_context.insert("html", &blog_html);
+
+            let rendered_html = self.tera.render("partials/blog.html", &tera_context).unwrap();
 
             let file_name = path.file_name().unwrap().to_str().unwrap().replace(".md", ".html");
             let mut blog_file = match File::create(
@@ -133,7 +150,13 @@ impl RenderEngine {
                     exit(1);
                 }
             }
+
+            rendered_posts.push(BlogPost {
+                title: context.title,
+                url: file_name
+            });
         }
+        rendered_posts
     }
 }
 
