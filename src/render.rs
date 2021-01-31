@@ -7,7 +7,7 @@ use serde_derive::{Deserialize, Serialize};
 use comrak::{markdown_to_html, ComrakOptions};
 use crate::errors;
 use std::process::exit;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub struct RenderEngine {
     pub tera: Tera
@@ -37,13 +37,13 @@ impl RenderEngine {
         RenderEngine { tera }
     }
 
-    pub fn render_index(&self, config: &Config, output_dir: &str) {
-        let out_path = Path::new(output_dir);
+    pub fn render_index(&self, config: &Config, output_dir: &str, verbose: bool) {
+        let mut out_path = PathBuf::from(output_dir);
         if !out_path.exists() {
-            match fs::create_dir(output_dir) {
+            match fs::create_dir_all(output_dir) {
                 Ok(_) => println!("Created new directory {}", output_dir),
                 Err(err) => {
-                    errors::display_io_error(err.kind, output_dir);
+                    errors::display_io_error(err, output_dir, verbose);
                     exit(1);
                 }
             }
@@ -51,32 +51,32 @@ impl RenderEngine {
 
         let rendered_html = self.tera.render("index.html", &Context::from_serialize(&config).unwrap()).unwrap();
 
-        out_path.join("index.html");
+        out_path.push("index.html");
         let out_path_str = out_path.to_str().unwrap();
-        let mut index_file = match File::create(out_path) {
+        let mut index_file = match File::create(&out_path) {
           Ok(index_file) => index_file,
           Err(err) => {
-              errors::display_io_error(err.kind(), out_path_str);
+              errors::display_io_error(err, out_path_str, verbose);
               exit(1);
           }
         };
         match index_file.write_all(rendered_html.as_bytes()) {
             Ok(_) => println!("Generated index.html."),
             Err(err) => {
-                errors::display_io_error(err.kind(), out_path_str);
+                errors::display_io_error(err, out_path_str, verbose);
                 exit(1);
             }
         };
     }
 
-    pub fn render_blog_posts(&self, output_dir: &str) {
+    pub fn render_blog_posts(&self, output_dir: &str, verbose: bool) {
         let out_path = Path::new(output_dir).join("posts");
         if !out_path.exists() {
-            match fs::create_dir(out_path) {
+            match fs::create_dir_all(&out_path) {
                 Ok(_) => {},
                 Err(err) => {
-                    let out_path_str = out_path.to_str().unwrap();
-                    errors::display_io_error(err.kind(), out_path_str);
+                    let out_path_str = &out_path.to_str().unwrap();
+                    errors::display_io_error(err, out_path_str, verbose);
                     exit(1);
                 }
             }
@@ -95,7 +95,7 @@ impl RenderEngine {
             let draft_content = match fs::read_to_string(&path) {
                 Ok(content) => content,
                 Err(err) => {
-                    errors::display_io_error(err.kind(), path_str);
+                    errors::display_io_error(err, path_str, verbose);
                     exit(1);
                 }
             };
@@ -113,24 +113,23 @@ impl RenderEngine {
             if context.draft {
                 continue;
             }
-
             let rendered_html = self.tera.render("partials/blog.html", &Context::from_serialize(&context).unwrap()).unwrap();
 
 
             let file_name = path.file_name().unwrap().to_str().unwrap().replace(".md", ".html");
             let mut blog_file = match File::create(
-                format!("output/posts/{}", &file_name)
+                format!("{}/posts/{}", &output_dir, &file_name)
             ) {
                 Ok(blog_file) => blog_file,
                 Err(err) => {
-                    errors::display_io_error(err.kind(), path_str);
+                    errors::display_io_error(err, path_str, verbose);
                     exit(1);
                 }
             };
             match blog_file.write_all(rendered_html.as_bytes()) {
                 Ok(_) => println!("Rendered {}", file_name),
                 Err(err) => {
-                    errors::display_io_error(err.kind(), path_str);
+                    errors::display_io_error(err, path_str, verbose);
                     exit(1);
                 }
             }

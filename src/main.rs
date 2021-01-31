@@ -7,7 +7,6 @@ use clap::{Arg, App};
 use config::Config;
 use render::RenderEngine;
 
-
 fn main() {
     let matches = App::new("raptr")
         .version("0.1.0")
@@ -33,7 +32,7 @@ fn main() {
         .arg(
             Arg::with_name("verbosity")
             .short("v")
-            .long("verbosity")
+            .long("verbose")
             .help("Shows detailed errors and logging messages")
             .takes_value(false)
         )
@@ -46,26 +45,14 @@ fn main() {
             .takes_value(true)
         )
         .get_matches();
-        
-    let config = Config::new();
 
-    let verbosity_active = matches.is_present("verbosity");
-    let verbosity_string = if verbosity_active { 
-        println!("verbosity active");
-        String::from("") 
-    } else { 
-        String::from("Try again with -v / --verbosity to display a more detailed error") 
-    };
+    let verbose = matches.occurrences_of("verbosity") == 1;
+    let config = Config::new();
 
     if let Some(project_name) = matches.value_of("new") {
         match project::create_project(&project_name) {
             Ok(_) => println!("Created your new project {}", project_name),
-            Err(err) => {
-                eprintln!("Could not create project. {}", verbosity_string);
-                if verbosity_active {
-                    eprintln!("{}", err);
-                }
-            }
+            Err(err) => errors::display_io_error(err, &project_name, verbose)
         };
     }
 
@@ -80,7 +67,7 @@ fn main() {
         let render_engine = RenderEngine::new(&config.theme);
 
         project::prepare_output_dir(&config.theme);
-        render_engine.render_index(&config, output_dir);
-        render_engine.render_blog_posts(output_dir);
+        render_engine.render_index(&config, output_dir, verbose);
+        render_engine.render_blog_posts(output_dir, verbose);
     }
 }
