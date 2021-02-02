@@ -47,11 +47,12 @@ fn main() {
         .get_matches();
 
     let verbose = matches.occurrences_of("verbosity") == 1;
-    let config = Config::new(verbose);
 
     if let Some(project_name) = matches.value_of("new") {
         project::create_project(&project_name, verbose);
     }
+    
+    let config = Config::new(verbose);
 
     if let Some(draft_name) = matches.value_of("draft") {
         project::create_new_draft(&config.theme, &draft_name);
