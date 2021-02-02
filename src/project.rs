@@ -6,7 +6,7 @@ use crate::errors;
 use std::process::exit;
 
 pub fn create_project(project_name: &str, verbose: bool) {
-    let root_dir = Path::new("./").join(&project_name);
+    let root_dir = Path::new(&project_name);
     match fs::create_dir(&root_dir) {
         Ok(_) => {},
         Err(err) => {
@@ -27,6 +27,8 @@ pub fn create_project(project_name: &str, verbose: bool) {
             }
         }
     }
+
+    println!("Created new project {}", root_dir.to_str().unwrap_or(project_name));
 }
 
 pub fn prepare_output_dir(theme_name: &str, output_dir: &str, verbose: bool) {
