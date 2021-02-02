@@ -51,15 +51,15 @@ fn main() {
     if let Some(project_name) = matches.value_of("new") {
         project::create_project(&project_name, verbose);
     } else {
-        let config = Config::new(verbose);
-    
         if let Some(draft_name) = matches.value_of("draft") {
+            let config = Config::new(verbose);
             project::create_new_draft(&config.theme, &draft_name);
         }
     
         // use occurrences_of because we use default_value above and so is_present
         // will still return true.
         if matches.occurrences_of("publish") == 1 {
+            let config = Config::new(verbose);
             let output_dir = matches.value_of("publish").unwrap_or("output");
             let render_engine = RenderEngine::new(&config.theme);
     
