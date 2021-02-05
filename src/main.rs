@@ -6,9 +6,10 @@ mod errors;
 use clap::{Arg, App};
 use config::Config;
 use render::RenderEngine;
+use std::env;
 
 fn main() {
-    let matches = App::new("raptr")
+    let mut app = App::new("raptr")
         .version("0.1.0")
         .about("An opinionated blogging engine")
         .author("Tobias \"CodeF0x\" Oettl <contact@codef0x.dev>")
@@ -43,9 +44,15 @@ fn main() {
             .value_name("DRAFT_NAME")
             .help("Creates a new draft")
             .takes_value(true)
-        )
-        .get_matches();
+        );
 
+    let args: Vec<String> = env::args().skip(1).collect();
+    if args.is_empty() {
+        app.print_help().unwrap();
+        return;
+    }
+
+    let matches = app.get_matches();
     let verbose = matches.occurrences_of("verbosity") == 1;
 
     if let Some(project_name) = matches.value_of("new") {
