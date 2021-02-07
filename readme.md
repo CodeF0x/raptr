@@ -15,7 +15,14 @@ raptr is a minimalistic and opinionated blogging engine. It's fast, easy to set-
 
 ## ~ Installation ~
 
-Right now you need to compile it yourself -- sorry! :( But I'll provide binaries in the near future!
+<a href="https://github.com/CodeF0x/raptr/wiki/Installation">Learn how to install raptr</a> or compile it yourself:
+
+```shell
+$ git clone https://github.com/CodeF0x/raptr
+$ cd raptr
+$ cargo build --release
+```
+The resulting binary will be at `./target/release`.
 
 ## ~ Usage ~
 
