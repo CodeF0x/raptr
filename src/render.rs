@@ -127,7 +127,15 @@ impl RenderEngine {
             }
 
             let html_str = split_draft[2];
-            let blog_html = markdown_to_html(html_str, &ComrakOptions::default());
+
+            let mut options = ComrakOptions::default();
+            options.extension.strikethrough = true;
+            options.extension.table = true;
+            options.extension.tasklist = true;
+            options.extension.superscript = true;
+            options.extension.footnotes = true;
+
+            let blog_html = markdown_to_html(html_str, &options);
             let mut tera_context = Context::from_serialize(&context).unwrap();
             tera_context.insert("html", &blog_html);
 
