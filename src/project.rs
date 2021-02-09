@@ -4,6 +4,8 @@ use std::fs::File;
 use fs_extra::dir::{copy, CopyOptions};
 use crate::errors;
 use std::process::exit;
+use std::io::Write;
+use chrono::prelude::*;
 
 pub fn create_project(project_name: &str, verbose: bool) {
     let root_dir = Path::new(&project_name);
@@ -65,10 +67,15 @@ pub fn create_new_draft(theme_name: &str, draft_name: &str) {
         exit(1);
     }
 
-    let _draft_file = File::create(&draft_path).expect("Could not create new draft.");
-    fs::copy(
-        format!("themes/{}/archetypes/post.md", &theme_name),
-        &draft_path
-    ).expect("Could not copy archetype to new draft file");
+    let mut draft_file = File::create(&draft_path).expect("Could not create new draft.");
+
+    let template_draft_header = fs::read_to_string(
+        format!("themes/{}/archetypes/post.md", theme_name)
+    ).expect("Could not create a new draft.");
+    let date = Local::now();
+    let new_date_str = format!("date = \"{}\"", date);
+    let new_draft_header = template_draft_header.replace("date = \"\"", &new_date_str);
+
+    draft_file.write_all(new_draft_header.as_bytes()).expect("Could not create a new draft.");
     println!("Created a new draft {}", draft_name);
 }

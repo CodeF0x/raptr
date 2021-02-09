@@ -8,6 +8,7 @@ use comrak::{markdown_to_html, ComrakOptions};
 use crate::errors;
 use std::process::exit;
 use std::path::{Path, PathBuf};
+use chrono::prelude::*;
 
 pub struct RenderEngine {
     pub tera: Tera
@@ -26,6 +27,7 @@ struct BlogMetaData {
 
 #[derive(Deserialize, Serialize)]
 pub struct BlogPost {
+    age_in_seconds: i64,
     title: String,
     url: String
 }
@@ -79,7 +81,7 @@ impl RenderEngine {
         };
     }
 
-    pub fn render_blog_posts(&self, output_dir: &str, verbose: bool) -> Vec<BlogPost>{
+    pub fn render_blog_posts(&self, output_dir: &str, verbose: bool) -> Vec<BlogPost> {
         let mut rendered_posts: Vec<BlogPost> = vec![];
 
         let out_path = Path::new(output_dir).join("posts");
@@ -159,10 +161,14 @@ impl RenderEngine {
                 }
             }
 
+            let date_time = DateTime::parse_from_str(&context.date, "%Y-%m-%d %H:%M:%S%.f %z").unwrap();
+
             rendered_posts.push(BlogPost {
+                age_in_seconds: date_time.timestamp(),
                 title: context.title,
                 url: file_name
             });
+            rendered_posts.sort_by(|a, b| b.age_in_seconds.cmp(&a.age_in_seconds))
         }
         rendered_posts
     }
