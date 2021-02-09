@@ -57,9 +57,8 @@ pub fn prepare_output_dir(theme_name: &str, output_dir: &str, verbose: bool) {
 }
 
 pub fn create_new_draft(theme_name: &str, draft_name: &str) {
-    let draft_path = Path::new("drafts").join(
-        format!("{}.md", draft_name)
-    );
+    let mut draft_path = Path::new("drafts").join(draft_name);
+    draft_path.set_extension("md");
 
     if draft_path.exists() {
         eprintln!("A draft with that name already exists.");

@@ -71,7 +71,7 @@ impl RenderEngine {
           }
         };
         match index_file.write_all(rendered_html.as_bytes()) {
-            Ok(_) => println!("Generated index.html."),
+            Ok(_) => println!("Rendered index.html"),
             Err(err) => {
                 errors::display_io_error(err, out_path_str, verbose);
                 exit(1);
