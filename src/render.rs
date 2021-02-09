@@ -140,6 +140,8 @@ impl RenderEngine {
             let blog_html = markdown_to_html(html_str, &options);
             let mut tera_context = Context::from_serialize(&context).unwrap();
             tera_context.insert("html", &blog_html);
+            let human_friendly_date: &str = context.date.split(" ").collect::<Vec<&str>>()[0];
+            tera_context.insert("human_friendly_date", human_friendly_date);
 
             let rendered_html = self.tera.render("partials/blog.html", &tera_context).unwrap();
 
@@ -168,7 +170,7 @@ impl RenderEngine {
                 title: context.title,
                 url: file_name
             });
-            rendered_posts.sort_by(|a, b| b.age_in_seconds.cmp(&a.age_in_seconds))
+            rendered_posts.sort_by(|a, b| b.age_in_seconds.cmp(&a.age_in_seconds));
         }
         rendered_posts
     }
