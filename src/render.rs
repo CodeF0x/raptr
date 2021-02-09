@@ -170,6 +170,7 @@ impl RenderEngine {
                 title: context.title,
                 url: file_name
             });
+            // newest post should be first in array
             rendered_posts.sort_by(|a, b| b.age_in_seconds.cmp(&a.age_in_seconds));
         }
         rendered_posts
