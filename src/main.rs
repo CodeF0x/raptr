@@ -60,7 +60,7 @@ fn main() {
     } else {
         if let Some(draft_name) = matches.value_of("draft") {
             let config = Config::new(verbose);
-            project::create_new_draft(&config.theme, &draft_name);
+           project::create_new_draft(&config.theme, &draft_name, verbose);
         }
     
         // use occurrences_of because we use default_value above and so is_present
