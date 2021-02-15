@@ -1,28 +1,30 @@
 # Welcome to raptr
 
-raptr is a minimalistic and opinionated blogging engine. It's fast, easy to set-up and easy to use. 
+raptr is a minimal, static site generator and blogging-engine. It's fast, easy to set-up and easy to use.
 
 ---
 
 ## ~ Features ~
 
-* use themes made by the community or create your own
-* edit and tweak existing themes
-* fast and easy to use with only the bare minimum of commands
-* outputs web-ready websites with all required assets -- just put it on your web server and you're ready to go
-* quickly create posts and write them in markdown
-* raptr comes as a standalone -- no dependencies like Java, Go, Node.js, you name it
+- use themes made by the community or create your own
+- edit and tweak existing themes
+- fast and easy to use with only the bare minimum of commands
+- outputs web-ready websites with all required assets -- just put it on your web server and you're ready to go
+- quickly create posts and write them in markdown
+- raptr comes as a small standalone for any system
 
 ## ~ Installation ~
 
-<a href="https://github.com/CodeF0x/raptr/wiki/Installation">Learn how to install raptr</a> or compile it yourself:
+You need <a href="https://git-scm.com/">Git</a>, which you probably already have, and <a href="https://doc.rust-lang.org/cargo/">Cargo</a> which is usally pretty easy to install.
+Once you've got both, run
 
 ```shell
-$ git clone https://github.com/CodeF0x/raptr
-$ cd raptr
-$ cargo build --release
+cargo install raptr
 ```
-The resulting binary will be at `./target/release`.
+
+in your terminal and you're done!
+
+For other methods, see <a href="https://github.com/CodeF0x/raptr/wiki/Installation">"Install raptr"</a> in the official wiki.
 
 ## ~ Usage ~
 
