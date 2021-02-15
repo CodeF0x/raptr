@@ -39,6 +39,10 @@ pub struct BlogPost {
 
 impl RenderEngine {
     /// Creates a new instance of the Tera render engine
+    ///
+    /// # Arguments
+    ///
+    /// * `theme_name` - string slice of theme name. Used for parsing the templates
     pub fn new(theme_name: &str) -> Self {
         let tera = match Tera::new(
             format!("themes/{}/**/*.html", &theme_name).as_str()
@@ -55,6 +59,12 @@ impl RenderEngine {
     }
 
     /// Renders the index.html file
+    ///
+    /// # Arguments
+    ///
+    /// * `config` - config struct that holds user data from config.toml
+    /// * `user_output_directory` - string slice of target path -- either supplied by user or default value from the clap library
+    /// * `links` - vector of already rendered blog posts -- holds post date, post link and post name
     pub fn render_index(&self, config: &Config, user_output_directory: &str, links: Vec<BlogPost>, verbose: bool) {
         let output_directory = PathBuf::from(user_output_directory);
 
@@ -80,6 +90,11 @@ impl RenderEngine {
     }
 
     /// Renders all draft files that are not ignored via header
+    ///
+    /// # Arguments
+    ///
+    /// * `user_output_directory` - string slice of output path -- either supplied by user or by the clap library
+    /// * `verbose` - boolean if the verbose mod is on
     pub fn render_blog_posts(&self, user_output_directory: &str, verbose: bool) -> Vec<BlogPost> {
         let mut rendered_posts: Vec<BlogPost> = vec![];
 

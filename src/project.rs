@@ -13,6 +13,11 @@ use std::io::Write;
 use chrono::prelude::*;
 
 /// Creates a new project
+///
+/// # Arguments
+///
+/// * `project_name` - string slice of the project name
+/// * `verbose` - boolean if verbose mode is on
 pub fn create_project(project_name: &str, verbose: bool) {
     let root_dir = Path::new(&project_name);
     match fs::create_dir(&root_dir) {
@@ -42,6 +47,12 @@ pub fn create_project(project_name: &str, verbose: bool) {
 /// Copies assets from selected theme to output directory
 /// and creates target directory and sub directories
 /// in case they do not exist yet
+///
+/// # Arguments
+///
+/// * `theme_name` - string slice that holds the name of the used theme
+/// * `output_dir` - string slice that holds the target path
+/// * `verbose` - boolean if the verbose mode is on
 pub fn prepare_output_dir(theme_name: &str, output_dir: &str, verbose: bool) {
     if let Ok(mut entries) = fs::read_dir("themes") {
         if entries.next().is_none() {
@@ -68,6 +79,12 @@ pub fn prepare_output_dir(theme_name: &str, output_dir: &str, verbose: bool) {
 }
 
 /// Creates a new draft file and writes it to ./drafts
+///
+/// # Arguments
+///
+/// * `theme_name` - string slice that holds the theme name
+/// * `draft_name` - string slice that holds the name of the draft file
+/// * `verbose` - boolean if verbose mode is on
 pub fn create_new_draft(theme_name: &str, draft_name: &str, verbose: bool) {
     let mut draft_path = Path::new("drafts").join(draft_name);
     draft_path.set_extension("md");

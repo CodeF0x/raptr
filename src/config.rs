@@ -1,3 +1,7 @@
+//! # config.rs
+//!
+//! Contains the code for parsing the config.
+
 use serde_derive::{Deserialize, Serialize};
 use toml;
 use std::fs;
@@ -17,6 +21,11 @@ pub struct Config {
 }
 
 impl Config {
+    /// Returns a new config by parsing the config.toml file
+    ///
+    /// # Arguments
+    ///
+    /// * `verbose` - boolean if verbose mode is on
     pub fn new(verbose: bool) -> Self {
         let config_string = match fs::read_to_string("./config.toml") {
             Ok(config_str) => config_str,
