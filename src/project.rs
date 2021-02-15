@@ -1,3 +1,8 @@
+//! # project.rs
+//!
+//! Contains all functions required for
+//! project organisation.
+
 use std::fs;
 use std::path::Path;
 use std::fs::File;
@@ -7,6 +12,7 @@ use std::process::exit;
 use std::io::Write;
 use chrono::prelude::*;
 
+/// Creates a new project
 pub fn create_project(project_name: &str, verbose: bool) {
     let root_dir = Path::new(&project_name);
     match fs::create_dir(&root_dir) {
@@ -33,6 +39,9 @@ pub fn create_project(project_name: &str, verbose: bool) {
     println!("Created new project {}", project_name);
 }
 
+/// Copies assets from selected theme to output directory
+/// and creates target directory and sub directories
+/// in case they do not exist yet
 pub fn prepare_output_dir(theme_name: &str, output_dir: &str, verbose: bool) {
     if let Ok(mut entries) = fs::read_dir("themes") {
         if entries.next().is_none() {
@@ -58,6 +67,7 @@ pub fn prepare_output_dir(theme_name: &str, output_dir: &str, verbose: bool) {
     ).expect("Could not copy all necessary theme files to the output destination.");
 }
 
+/// Creates a new draft file and writes it to ./drafts
 pub fn create_new_draft(theme_name: &str, draft_name: &str, verbose: bool) {
     let mut draft_path = Path::new("drafts").join(draft_name);
     draft_path.set_extension("md");

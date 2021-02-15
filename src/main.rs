@@ -1,3 +1,8 @@
+//! # main.rs
+//!
+//! Gathers user input and launches appropriate
+//! program behavior.
+
 mod project;
 mod config;
 mod render;

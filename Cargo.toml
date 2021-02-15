@@ -3,6 +3,8 @@ name = "raptr"
 version = "0.1.0"
 authors = ["CodeF0x <contact@codef0x.dev>"]
 edition = "2018"
+description = "A minimal, fast and easy to use static site generator and blogging-engine."
+license = "MIT"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

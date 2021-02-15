@@ -1,3 +1,8 @@
+//! # render.rs
+//!
+//! Contains all functions regarding templating and
+//! generating HTML files from drafts.
+
 use tera::{Tera, Context};
 use crate::config::Config;
 use std::fs::File;
@@ -33,6 +38,7 @@ pub struct BlogPost {
 }
 
 impl RenderEngine {
+    /// Creates a new instance of the Tera render engine
     pub fn new(theme_name: &str) -> Self {
         let tera = match Tera::new(
             format!("themes/{}/**/*.html", &theme_name).as_str()
@@ -48,6 +54,7 @@ impl RenderEngine {
         RenderEngine { tera }
     }
 
+    /// Renders the index.html file
     pub fn render_index(&self, config: &Config, user_output_directory: &str, links: Vec<BlogPost>, verbose: bool) {
         let output_directory = PathBuf::from(user_output_directory);
 
@@ -72,6 +79,7 @@ impl RenderEngine {
         };
     }
 
+    /// Renders all draft files that are not ignored via header
     pub fn render_blog_posts(&self, user_output_directory: &str, verbose: bool) -> Vec<BlogPost> {
         let mut rendered_posts: Vec<BlogPost> = vec![];
 
