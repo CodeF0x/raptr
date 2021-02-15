@@ -5,6 +5,12 @@ authors = ["CodeF0x <contact@codef0x.dev>"]
 edition = "2018"
 description = "A minimal, fast and easy to use static site generator and blogging-engine."
 license = "MIT"
+readme = "readme.md"
+repository = "https://github.com/CodeF0x/raptr"
+homepage = "https://github.com/CodeF0x/raptr/wiki"
+keywords = ["static site generator", "blogging-engine", "blog", "website generator"]
+categories = ["command-line-utilities", "web-programming"]
+documentation = ""
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
