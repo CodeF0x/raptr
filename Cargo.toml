@@ -10,7 +10,6 @@ repository = "https://github.com/CodeF0x/raptr"
 homepage = "https://github.com/CodeF0x/raptr/wiki"
 keywords = ["blog", "website-generator", "markdown", "cli"]
 categories = ["command-line-utilities", "web-programming"]
-documentation = ""
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
