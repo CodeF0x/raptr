@@ -1,0 +1,32 @@
+name: raptr
+version: '0.1.0'
+summary:  A minimal, fast and easy to use static site generator and blogging-engine.
+description: |
+  raptr is a minimal and fast static site generator with built-in blog support that runs in your commandline.
+  You can use themes made by the community, create your own or even modify existing ones.
+  raptr enables you to quickly set up a blog entry, write it in markdown and publish it to the world.
+  
+  To keep it short, raptr enables you to:
+  
+  - use themes made by the community or create your own
+  - edit and tweak existing themes
+  - spin up a personal blog easy and fast with only the bare minimum of commands
+  - output web-ready websites with all required assets -- just put it on your web server and you're ready to go
+  - quickly create posts and write them in markdown
+confinement: devmode
+base: core18
+parts:
+  raptr:
+    plugin: rust
+    source: https://github.com/CodeF0x/raptr.git
+architectures:
+  - build-on: s390x
+  - build-on: ppc64el
+  - build-on: arm64
+  - build-on: armhf
+  - build-on: amd64
+  - build-on: i386
+
+apps:
+  raptr:
+    command: bin/raptr
