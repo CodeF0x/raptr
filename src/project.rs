@@ -11,6 +11,7 @@ use crate::errors;
 use std::process::exit;
 use std::io::Write;
 use chrono::prelude::*;
+use crate::constants::CONFIG_FILE_DEFAULT_VALUE;
 
 /// Creates a new project
 ///
@@ -38,6 +39,23 @@ pub fn create_project(project_name: &str, verbose: bool) {
                 errors::display_io_error(err, project_name,  verbose);
                 exit(1);
             }
+        }
+    }
+
+    let mut config_file = match File::create(
+        Path::new(root_dir).join("config.toml")
+    ) {
+        Ok(config_file) => config_file,
+        Err(err) => {
+            errors::display_io_error(err, project_name, verbose);
+            exit(1);
+        }
+    };
+    match config_file.write_all(CONFIG_FILE_DEFAULT_VALUE.as_bytes()) {
+        Ok(_) => {},
+        Err(err) => {
+            errors::display_io_error(err, project_name, verbose);
+            exit(1);
         }
     }
 

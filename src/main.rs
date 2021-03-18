@@ -7,6 +7,7 @@ mod project;
 mod config;
 mod render;
 mod errors;
+mod constants;
 
 use clap::{Arg, App};
 use config::Config;
