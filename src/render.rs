@@ -190,4 +190,3 @@ impl RenderEngine {
         rendered_posts
     }
 }
-

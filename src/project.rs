@@ -7,11 +7,16 @@ use std::fs;
 use std::path::Path;
 use std::fs::File;
 use fs_extra::dir::{copy, CopyOptions};
-use crate::errors;
 use std::process::exit;
 use std::io::Write;
 use chrono::prelude::*;
-use crate::constants::CONFIG_FILE_DEFAULT_VALUE;
+use crate::{
+    errors,
+    constants::CONFIG_FILE_DEFAULT_VALUE,
+    config::Config,
+    render::RenderEngine,
+    project
+};
 
 /// Creates a new project
 ///
@@ -140,4 +145,20 @@ pub fn create_new_draft(theme_name: &str, draft_name: &str, verbose: bool) {
         }
     }
     println!("Created a new draft at {}", draft_path.to_str().unwrap_or(draft_name));
+}
+
+/// Calls all required steps to build the project.
+///
+/// # Arguments
+///
+/// * `matches` - Clap matches struct
+/// * `verbose` - bool if detailed error message should be shown
+pub fn build_project(matches: &clap::ArgMatches, verbose: bool) {
+    let config = Config::new(verbose);
+    let output_dir = matches.value_of("publish").unwrap_or("output");
+    let render_engine = RenderEngine::new(&config.theme);
+
+    project::prepare_output_dir(&config.theme, output_dir, verbose);
+    let links = render_engine.render_blog_posts(output_dir, verbose);
+    render_engine.render_index(&config, output_dir, links, verbose);
 }

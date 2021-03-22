@@ -11,10 +11,11 @@ mod constants;
 
 use clap::{Arg, App};
 use config::Config;
-use render::RenderEngine;
 use std::env;
+use warp;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let mut app = App::new("raptr")
         .version("0.1.0")
         .about("An opinionated blogging engine")
@@ -50,6 +51,15 @@ fn main() {
             .value_name("DRAFT_NAME")
             .help("Creates a new draft")
             .takes_value(true)
+        )
+        .arg(
+            Arg::with_name("serve")
+                .short("s")
+                .long("serve")
+                .value_name("PORT")
+                .help("Serves a preview at specified port or standard port if none is set")
+                .takes_value(true)
+                .default_value("3000")
         );
 
     let args: Vec<String> = env::args().skip(1).collect();
@@ -72,14 +82,22 @@ fn main() {
         // use occurrences_of because we use default_value above and so is_present
         // will still return true.
         if matches.occurrences_of("publish") == 1 {
-            let config = Config::new(verbose);
-            let output_dir = matches.value_of("publish").unwrap_or("output");
-            let render_engine = RenderEngine::new(&config.theme);
-    
-            project::prepare_output_dir(&config.theme, output_dir, verbose);
-            let links = render_engine.render_blog_posts(output_dir, verbose);
-            render_engine.render_index(&config, output_dir, links, verbose);
+            project::build_project(&matches, verbose);
+        }
+
+        if matches.occurrences_of("serve") == 1 {
+            let port = matches.value_of("serve").unwrap().parse::<u16>().unwrap();
+            let mut output_dir = env::temp_dir();
+            output_dir.push("raptr");
+            let output_dir = String::from(output_dir.to_str().unwrap());
+
+            project::build_project(&matches, verbose);
+
+            println!("Serving on localhost:{}. Press CRTL + C to exit.", port);
+
+            warp::serve(warp::fs::dir(output_dir))
+                .run(([127, 0, 0, 1], port))
+                .await;
         }
     }
-    
 }
