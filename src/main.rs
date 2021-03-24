@@ -82,7 +82,8 @@ async fn main() {
         // use occurrences_of because we use default_value above and so is_present
         // will still return true.
         if matches.occurrences_of("publish") == 1 {
-            project::build_project(&matches, verbose);
+            let output_dir = matches.value_of("publish").unwrap();
+            project::build_project(output_dir, verbose);
         }
 
         if matches.occurrences_of("serve") == 1 {
@@ -91,7 +92,7 @@ async fn main() {
             output_dir.push("raptr");
             let output_dir = String::from(output_dir.to_str().unwrap());
 
-            project::build_project(&matches, verbose);
+            project::build_project(&output_dir, verbose);
 
             println!("Serving on localhost:{}. Press CRTL + C to exit.", port);
 

@@ -153,9 +153,8 @@ pub fn create_new_draft(theme_name: &str, draft_name: &str, verbose: bool) {
 ///
 /// * `matches` - Clap matches struct
 /// * `verbose` - bool if detailed error message should be shown
-pub fn build_project(matches: &clap::ArgMatches, verbose: bool) {
+pub fn build_project(output_dir: &str, verbose: bool) {
     let config = Config::new(verbose);
-    let output_dir = matches.value_of("publish").unwrap_or("output");
     let render_engine = RenderEngine::new(&config.theme);
 
     project::prepare_output_dir(&config.theme, output_dir, verbose);
