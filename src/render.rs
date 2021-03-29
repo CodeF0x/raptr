@@ -95,7 +95,7 @@ impl RenderEngine {
     ///
     /// * `user_output_directory` - string slice of output path -- either supplied by user or by the clap library
     /// * `verbose` - boolean if the verbose mod is on
-    pub fn render_blog_posts(&self, user_output_directory: &str, verbose: bool) -> Vec<BlogPost> {
+    pub fn render_blog_posts(&self, user_output_directory: &str, verbose: bool, include_all_drafts: bool) -> Vec<BlogPost> {
         let mut rendered_posts: Vec<BlogPost> = vec![];
 
         let output_directory = Path::new(user_output_directory).join("posts");
@@ -128,7 +128,7 @@ impl RenderEngine {
                 }
             };
 
-            let split_draft: Vec<&str> = draft_content.split("---").collect();
+            let split_draft: Vec<&str> = draft_content.split("+++").collect();
             let draft_header = split_draft[1];
             let blog_meta_data: BlogMetaData = match toml::from_str(draft_header) {
                 Ok(context) => context,
@@ -138,7 +138,7 @@ impl RenderEngine {
                 }
             };
 
-            if blog_meta_data.draft {
+            if blog_meta_data.draft && !include_all_drafts {
                 continue;
             }
 

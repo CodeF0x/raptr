@@ -60,6 +60,13 @@ async fn main() {
                 .help("Serves a preview at specified port or standard port if none is set")
                 .takes_value(true)
                 .default_value("3000")
+        )
+        .arg(
+            Arg::with_name("include-all-drafts")
+                .short("i")
+                .long("include-all-drafts")
+                .takes_value(false)
+                .help("Includes drafts that are not set to be generated when using --serve or --publish. Only valid when used together with --serve or --publish.")
         );
 
     let args: Vec<String> = env::args().skip(1).collect();
@@ -78,12 +85,13 @@ async fn main() {
             let config = Config::new(verbose);
            project::create_new_draft(&config.theme, &draft_name, verbose);
         }
-    
+
+        let include_all_drafts = matches.occurrences_of("include-all-drafts") == 1;
         // use occurrences_of because we use default_value above and so is_present
         // will still return true.
         if matches.occurrences_of("publish") == 1 {
             let output_dir = matches.value_of("publish").unwrap();
-            project::build_project(output_dir, verbose);
+            project::build_project(output_dir, verbose, include_all_drafts);
         }
 
         if matches.occurrences_of("serve") == 1 {
@@ -92,7 +100,7 @@ async fn main() {
             output_dir.push("raptr");
             let output_dir = String::from(output_dir.to_str().unwrap());
 
-            project::build_project(&output_dir, verbose);
+            project::build_project(&output_dir, verbose, include_all_drafts);
 
             println!("Serving on localhost:{}. Press CRTL + C to exit.", port);
 

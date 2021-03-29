@@ -153,11 +153,11 @@ pub fn create_new_draft(theme_name: &str, draft_name: &str, verbose: bool) {
 ///
 /// * `matches` - Clap matches struct
 /// * `verbose` - bool if detailed error message should be shown
-pub fn build_project(output_dir: &str, verbose: bool) {
+pub fn build_project(output_dir: &str, verbose: bool, include_all_drafts: bool) {
     let config = Config::new(verbose);
     let render_engine = RenderEngine::new(&config.theme);
 
     project::prepare_output_dir(&config.theme, output_dir, verbose);
-    let links = render_engine.render_blog_posts(output_dir, verbose);
+    let links = render_engine.render_blog_posts(output_dir, verbose, include_all_drafts);
     render_engine.render_index(&config, output_dir, links, verbose);
 }
