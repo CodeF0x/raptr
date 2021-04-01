@@ -17,7 +17,7 @@ use warp;
 #[tokio::main]
 async fn main() {
     let mut app = App::new("raptr")
-        .version("0.1.0")
+        .version("0.2.0")
         .about("An opinionated blogging engine")
         .author("Tobias \"CodeF0x\" Oettl <contact@codef0x.dev>")
         .arg(

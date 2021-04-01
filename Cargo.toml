@@ -1,6 +1,6 @@
 [package]
 name = "raptr"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["CodeF0x <contact@codef0x.dev>"]
 edition = "2018"
 description = "A minimal, fast and easy to use static site generator and blogging-engine."
