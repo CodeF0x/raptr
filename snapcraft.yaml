@@ -14,7 +14,7 @@ description: |
   - output web-ready websites with all required assets -- just put it on your web server and you're ready to go
   - quickly create posts and write them in markdown
   - built in dev-server to preview your site
-confinement: devmode
+confinement: strict
 base: core18
 parts:
   raptr:
@@ -30,4 +30,7 @@ architectures:
 
 apps:
   raptr:
+    plugs:
+      - home
+      - network-bind
     command: bin/raptr
